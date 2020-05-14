@@ -1,0 +1,41 @@
+.menu-btn {
+  border-radius: 2px;
+  padding: 2px;
+  font-size: 28px;
+  text-align: center;
+  font-weight: 900;
+  user-select: none;
+
+  background:#cc9a69;
+  color: #452000;
+  border:none;
+  position:relative;
+  font-size:1.6em;
+  cursor:pointer;
+  transition:800ms ease all;
+}
+
+.menu-btn:hover{
+  background:#452000;
+  color: #cc9a69;
+}
+.menu-btn:before,.menu-btn:after{
+  content:'';
+  position:absolute;
+  top:0;
+  right:0;
+  height: 5%;
+  width:0;
+  background: #cc9a69;
+  transition:400ms ease all;
+}
+.menu-btn:after{
+  right:inherit;
+  top:inherit;
+  left:0;
+  bottom:0;
+}
+.menu-btn:hover:before,.menu-btn:hover:after{
+  width:100%;
+  transition:800ms ease all;
+}

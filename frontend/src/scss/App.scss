@@ -1,0 +1,9 @@
+@import "constants.scss";
+.app {
+  border: 5px solid #452000;
+  width: $appWidth;
+  height: $appHeight;
+  margin: auto;
+  margin-top: 10px;
+  // background-image: url('../img/800_600.png');
+}
