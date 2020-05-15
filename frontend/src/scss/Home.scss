@@ -3,8 +3,10 @@
 .home {
   height: 100%;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+  user-select: none;
 
   .menu {
     background-color: #452000;
@@ -17,7 +19,78 @@
 
     .menu-btn {
       height: 100px;
-      width: 90%;
+      width: 350px;
+      font-size: 2.5rem;
+    }
+
+    .menu-title {
+      height: 100px;
+      width: 350px;
+      color: #cc9a69;
+      font-weight: 900;
+      font-size: 2.5rem;
+      position:relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .menu-title:before,.menu-title:after{
+      content:'';
+      position:absolute;
+      top:0;
+      right:0;
+      height: 3px;
+      width:100%;
+      background: #cc9a69;
+    }
+
+    .menu-title:after{
+      right:inherit;
+      top:inherit;
+      left:0;
+      bottom:0;
+    }
+
+    .home-btn {
+      display: flex;
+      height: 30%;
+      align-self: flex-end;
+      align-items: flex-end;
+      padding-right: 25px;
+      padding-bottom: 25px;
+
+      .menu-btn {
+        font-size: 1.6rem;
+        height: 45px;
+        width: 100px;
+      }
+    }
+  }
+}
+
+.forms {
+  display: flex;
+  flex-direction: column;
+  height: 30%;
+  justify-content: space-around;
+  padding-top: 10px;
+
+  .form {
+    display: flex;
+    justify-content: space-between;
+
+    input {
+      font-size: 1.6rem;
+      height: 38px;
+      width: 60%;
+      margin-left: 25px;
+    }
+    .menu-btn {
+      font-size: 1.6rem;
+      width: 100px;
+      height: 45px;
+      margin-right: 25px;
     }
   }
 }

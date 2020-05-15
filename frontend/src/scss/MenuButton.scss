@@ -1,10 +1,11 @@
 .menu-btn {
-  border-radius: 2px;
-  padding: 2px;
-  font-size: 28px;
-  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
   font-weight: 900;
   user-select: none;
+  height: 50px;
 
   background:#cc9a69;
   color: #452000;
@@ -24,7 +25,7 @@
   position:absolute;
   top:0;
   right:0;
-  height: 5%;
+  height: 3px;
   width:0;
   background: #cc9a69;
   transition:400ms ease all;
