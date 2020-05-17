@@ -51,14 +51,17 @@
       left:0;
       bottom:0;
     }
+    p {
+      color: #cc9a69;
+    }
 
     .home-btn {
       display: flex;
-      height: 30%;
+      height: 20%;
       align-self: flex-end;
       align-items: flex-end;
       padding-right: 25px;
-      padding-bottom: 25px;
+      padding-bottom: 10px;
 
       .menu-btn {
         font-size: 1.6rem;
@@ -72,16 +75,16 @@
 .forms {
   display: flex;
   flex-direction: column;
-  height: 30%;
-  justify-content: space-around;
-  padding-top: 10px;
+  justify-content: center;
+  margin-top: 10px;
 
   .form {
     display: flex;
     justify-content: space-between;
+    padding-bottom: 10px;
 
     input {
-      font-size: 1.6rem;
+      font-size: 1.3rem;
       height: 38px;
       width: 60%;
       margin-left: 25px;

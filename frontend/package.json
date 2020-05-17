@@ -32,7 +32,7 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:9229",
+  "proxy": "http://localhost:8000",
   "devDependencies": {
     "node-sass": "^4.14.1"
   }

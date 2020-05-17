@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import axios from 'axios'
 
 import '../scss/Home.scss'
 import * as elements from './Elements.js'
@@ -33,9 +34,17 @@ class Home extends Component {
     console.log('Check:', username)
   }
 
-  handleSignin = () => {
+  handleSignup = () => {
     const { username, password } = this.state
-    console.log('Sign-in:', username, password)
+
+    axios.post('user/' + username, { password })
+    .then(res => {
+      console.log("res:", res.data.message)
+    })
+    .catch(err => {
+      const message = err.response.data.message || 'error occured.'
+      console.log("err:", message)
+    })
   }
 
 
@@ -47,19 +56,19 @@ class Home extends Component {
       menuWidth: 400,
       menuHeight: 270,
       contents: [
-        elements.ButtonInMenu('main01', 'Sign-in', this.setSigninState),
+        elements.ButtonInMenu('main01', 'Sign-up', this.setSignupState),
         elements.ButtonInMenu('main02', 'Login', this.setLoginState)
       ]
     })
   }
 
-  setSigninState = () => {
+  setSignupState = () => {
     this.setState({
       home: false,
       menuWidth: 400,
       menuHeight: 450,
       contents: [
-        elements.MenuTitle('Sign-in'),
+        elements.MenuTitle('Sign-up'),
         elements.Forms(
           'forms01',
           [
@@ -74,11 +83,12 @@ class Home extends Component {
               name: 'password',
               onChange: this.inputChange,
               placeholder:'PASSWORD',
-              text: 'Sign-in',
-              onSubmit: this.handleSignin
+              text: 'Sign-up',
+              onSubmit: this.handleSignup
             }
           ]
         ),
+        elements.WarningMsg(),
         elements.ButtonHome({ key: 'home01', text: 'Home', onClick: this.setHomeState })
       ]
     })
@@ -108,6 +118,7 @@ class Home extends Component {
             }
           ]
         ),
+        elements.WarningMsg(),
         elements.ButtonHome({ key: 'home02', text: 'Home', onClick: this.setHomeState })
       ]
     })
@@ -126,6 +137,7 @@ class Home extends Component {
         >
           {contents}
         </div>
+
       </div>
     )
   }

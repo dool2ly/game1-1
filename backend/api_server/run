@@ -1,0 +1,1 @@
+sudo /home/dool2ly/st/prj02/baram/backend/venv/bin/python ./manage.py runserver

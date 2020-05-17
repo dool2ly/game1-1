@@ -26,7 +26,11 @@ export const Forms = (key, dataList) => {
 }
 
 export const ButtonHome = ({key, text, onClick}) => (
-  <div className='home-btn'>
+  <div key={key+'-btn'} className='home-btn'>
     {ButtonInMenu(key, text, onClick)}
   </div>
+)
+
+export const WarningMsg = () => (
+  <p>Use only ENG, Number</p>
 )
