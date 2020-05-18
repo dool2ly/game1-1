@@ -25,6 +25,26 @@ class Home extends Component {
       [e.target.name]: e.target.value
     })
   }
+  
+  handleError = (err) => {
+    const { createAlert } = this.props
+    const errors = err.response.data.errors
+    let message = ''
+
+    if (errors) {
+      const stringErrors = errors.map(element => {
+        switch(element) {
+          case 'ID_NOT_PLAIN_TEXT': return 'ID must be ENG or numeric.'
+          case 'INVALID_ID': return 'Unavaliable Id.'
+          case 'PASSWORD_NOT_PLAIN_TEXT': return 'Password must be ENG or numeric.'
+          default: return 'Unknown response.'
+        }
+      })
+      message = stringErrors.join('\n')
+    }
+    
+    createAlert({ title: 'Bad request', message })
+  }
 
   handleLogin = () => {
     const { username, password } = this.state
@@ -38,11 +58,7 @@ class Home extends Component {
       .then(res => {
         console.log('res:', res.data)
       })
-      .catch(err => {
-        const status = err.response.status
-        const message = err.response.data.message || `Status(${status}): error occured.`
-        createAlert({ title, message })
-      })
+      .catch(this.handleError)
     }
   }
 
@@ -62,11 +78,7 @@ class Home extends Component {
           createAlert({ title, message: 'Available ID'})
         }
       })
-      .catch(err => {
-        const status = err.response.status
-        const message = err.response.data.message || `Status(${status}): error occured.`
-        createAlert({ title, message })
-      })
+      .catch(this.handleError)
     }
   }
 
@@ -84,11 +96,7 @@ class Home extends Component {
         createAlert({ title, message: 'Welcome ' + username})
         this.props.history.push('/game')
       })
-      .catch(err => {
-        const status = err.response.status
-        const message = err.response.data.message || `Status(${status}): error occured.`
-        createAlert({ title, message })
-      })
+      .catch(this.handleError)
     }
   }
 

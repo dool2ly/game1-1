@@ -8,7 +8,11 @@ const AlertBox = ({ title, message, onClick }) => (
   <div className="AlertPortal">
     <div className="alert-box">
       <div className='alert-title'>{title}</div>
-      <div className='alert-msg'>{message}</div>
+      <div className='alert-msg'>{
+        message.split('\n').map((line, idx) => {
+          return (<span key={idx}>{line}<br /></span>)
+        })
+      }</div>
       <div className='menu-btn' onClick={onClick}>OK</div>
     </div>
   </div>
