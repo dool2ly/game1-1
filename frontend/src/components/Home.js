@@ -28,7 +28,22 @@ class Home extends Component {
 
   handleLogin = () => {
     const { username, password } = this.state
-    console.log('login:', username, password)
+    const { createAlert } = this.props
+    const title = 'Login'
+
+    if (!username || !password) {
+      createAlert({ title, message: 'Empty input.' })
+    } else {
+      axios.post(`user/${username}/login`, {password})
+      .then(res => {
+        console.log('res:', res.data)
+      })
+      .catch(err => {
+        const status = err.response.status
+        const message = err.response.data.message || `Status(${status}): error occured.`
+        createAlert({ title, message })
+      })
+    }
   }
 
   handleCheck = () => {
@@ -41,8 +56,8 @@ class Home extends Component {
     } else {
       axios.get('user/' + username)
       .then(res => {
-        if (res.data.message === 'exists') {
-          createAlert({ title, message: 'Unavailable ID'})
+        if (res.data.exists) {
+          createAlert({ title, message: 'ID is already in use.'})
         } else {
           createAlert({ title, message: 'Available ID'})
         }
