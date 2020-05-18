@@ -27,7 +27,7 @@ class UserSerializer(serializers.ModelSerializer):
     
     def validate_password(self, value):
         if not valid_plain_text(value):
-            raise ValidationError('PW_NOT_PLAI_TEXT')
+            raise ValidationError('PW_NOT_PLAIN_TEXT')
         return value
 
 class AvatarSerializer(serializers.ModelSerializer):

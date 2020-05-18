@@ -1,12 +1,14 @@
 import React, { Component } from 'react'
 import axios from 'axios'
+import { connect } from 'react-redux'
 
 import '../scss/Home.scss'
 import * as elements from './Elements.js'
+import { createAlert } from '../actions/AlertPortal'
+
 
 class Home extends Component {
   state = {
-    home: false,
     username: '',
     password: '',
     menuWidth: 0,
@@ -31,26 +33,25 @@ class Home extends Component {
 
   handleCheck = () => {
     const { username } = this.state
-    console.log('Check:', username)
   }
 
   handleSignup = () => {
     const { username, password } = this.state
+    const { createAlert } = this.props
 
     axios.post('user/' + username, { password })
     .then(res => {
-      console.log("res:", res.data.message)
+      console.log("res:", res.status)
+
     })
     .catch(err => {
-      const message = err.response.data.message || 'error occured.'
-      console.log("err:", message)
+      const message = err.response.data.message || 'Unknown error occured.'
+      createAlert({ title: 'Sign-in', message})
     })
   }
 
-
   setHomeState = () => {
     this.setState({
-      home: true,
       username: '',
       password: '',
       menuWidth: 400,
@@ -64,7 +65,6 @@ class Home extends Component {
 
   setSignupState = () => {
     this.setState({
-      home: false,
       menuWidth: 400,
       menuHeight: 450,
       contents: [
@@ -77,18 +77,20 @@ class Home extends Component {
               onChange: this.inputChange,
               placeholder:'ID',
               text: 'Check',
-              onSubmit: this.handleCheck
+              onSubmit: this.handleCheck,
+              type: 'text'
             },
             {
               name: 'password',
               onChange: this.inputChange,
               placeholder:'PASSWORD',
               text: 'Sign-up',
-              onSubmit: this.handleSignup
+              onSubmit: this.handleSignup,
+              type: 'password'
             }
           ]
         ),
-        elements.WarningMsg(),
+        elements.WarningMsg('warn01'),
         elements.ButtonHome({ key: 'home01', text: 'Home', onClick: this.setHomeState })
       ]
     })
@@ -96,7 +98,6 @@ class Home extends Component {
 
   setLoginState = () => {
     this.setState({
-      home: false,
       menuWidth: 400,
       menuHeight: 450,
       contents: [
@@ -109,23 +110,25 @@ class Home extends Component {
               onChange: this.inputChange,
               placeholder:'ID',
               text: 'Login',
-              onSubmit: this.handleLogin
+              onSubmit: this.handleLogin,
+              type: 'text'
             },
             {
               name: 'password',
               onChange: this.inputChange,
-              placeholder:'PASSWORD'
+              placeholder:'PASSWORD',
+              type: 'password'
             }
           ]
         ),
-        elements.WarningMsg(),
+        elements.WarningMsg('warn02'),
         elements.ButtonHome({ key: 'home02', text: 'Home', onClick: this.setHomeState })
       ]
     })
   }
 
   render() {
-    const { home, menuWidth, menuHeight, contents } = this.state
+    const { menuWidth, menuHeight, contents } = this.state
 
     return (
       <div className='home'>
@@ -143,4 +146,4 @@ class Home extends Component {
   }
 }
 
-export default Home
+export default connect(null, { createAlert })(Home)

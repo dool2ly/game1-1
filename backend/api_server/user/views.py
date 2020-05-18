@@ -30,6 +30,6 @@ class UserView(APIView):
                 message = "Invalid input."
 
         except Exception as e:
-            print("ERROR>> UserView.post",str(e))
+            print("[ERROR] UserView.post():", str(e))
         
         return Response({'message': message}, status_code)

@@ -11,9 +11,9 @@ export const MenuTitle = (text) => (
 )
 
 export const Forms = (key, dataList) => {
-  const formList = dataList.map(({ name, placeholder, onChange, onSubmit, text }) => (
+  const formList = dataList.map(({ name, placeholder, onChange, onSubmit, text, type }) => (
     <div key={key + name} className='form'>
-      <input name={name} placeholder={placeholder} onChange={onChange}/>
+      <input name={name} placeholder={placeholder} onChange={onChange} type={type}/>
       {text && ButtonInMenu(key + text, text, onSubmit)}
     </div>
   ))
@@ -31,6 +31,6 @@ export const ButtonHome = ({key, text, onClick}) => (
   </div>
 )
 
-export const WarningMsg = () => (
-  <p>Use only ENG, Number</p>
+export const WarningMsg = (key) => (
+  <p key={key}>Use only ENG, Number</p>
 )
