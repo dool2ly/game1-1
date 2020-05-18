@@ -10,7 +10,7 @@ def valid_plain_text(text):
     return False if reg.search(text) else True
 
 def has_admin(text):
-    reg = re.compile("admin")
+    reg = re.compile("admin", re.I)
     return True if reg.search(text) else False
 
 class UserSerializer(serializers.ModelSerializer):
@@ -27,7 +27,7 @@ class UserSerializer(serializers.ModelSerializer):
     
     def validate_password(self, value):
         if not valid_plain_text(value):
-            raise ValidationError('PW_NOT_PLAIN_TEXT')
+            raise ValidationError('PASSWORD_NOT_PLAIN_TEXT')
         return value
 
 class AvatarSerializer(serializers.ModelSerializer):

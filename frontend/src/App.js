@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { BrowserRouter, Route, Redirect } from 'react-router-dom'
 
 import './scss/App.scss'
 import Home from './components/Home'
@@ -9,14 +10,14 @@ import AlertPortal from './components/AlertPotal'
 class App extends Component {
   render() {
     return (
-      <div>
-        <div className="app">
-          <Home/>
-          <CSRFToken/>
-          
+      <BrowserRouter>
+        <div className='app'>
+          <Route path='/' exact component={Home} />
+          <Route path='/game' component={Game} />
+          <Redirect path='*' to='/' />
+          <AlertPortal />
         </div>
-        <AlertPortal />
-      </div>
+      </BrowserRouter>
     )
   }
 }

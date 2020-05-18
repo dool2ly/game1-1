@@ -33,21 +33,48 @@ class Home extends Component {
 
   handleCheck = () => {
     const { username } = this.state
+    const { createAlert } = this.props
+    const title = 'Check ID'
+
+    if (!username) {
+      createAlert({ title, message: 'Empty input.'})
+    } else {
+      axios.get('user/' + username)
+      .then(res => {
+        if (res.data.message === 'exists') {
+          createAlert({ title, message: 'Unavailable ID'})
+        } else {
+          createAlert({ title, message: 'Available ID'})
+        }
+      })
+      .catch(err => {
+        const status = err.response.status
+        const message = err.response.data.message || `Status(${status}): error occured.`
+        createAlert({ title, message })
+      })
+    }
   }
 
   handleSignup = () => {
     const { username, password } = this.state
     const { createAlert } = this.props
+    const title = 'Sign-up'
 
-    axios.post('user/' + username, { password })
-    .then(res => {
-      console.log("res:", res.status)
-
-    })
-    .catch(err => {
-      const message = err.response.data.message || 'Unknown error occured.'
-      createAlert({ title: 'Sign-in', message})
-    })
+    if (!username || !password) {
+      createAlert({ title, message: 'Empty input.' })
+    } else {
+      // Create user
+      axios.post('user/' + username, { password })
+      .then(res => {
+        createAlert({ title, message: 'Welcome ' + username})
+        this.props.history.push('/game')
+      })
+      .catch(err => {
+        const status = err.response.status
+        const message = err.response.data.message || `Status(${status}): error occured.`
+        createAlert({ title, message })
+      })
+    }
   }
 
   setHomeState = () => {
