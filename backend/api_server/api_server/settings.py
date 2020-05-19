@@ -125,3 +125,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 CORS_ORIGIN_WHITELIST = ['localhost:80/']
+
+REST_FRAMEWORK = {
+    "EXCEPTION_HANDLER": ("user.exceptions.custom_exception_handler"),
+}

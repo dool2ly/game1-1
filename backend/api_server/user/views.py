@@ -1,63 +1,55 @@
 from rest_framework import status
-from rest_framework.views import APIView
-from rest_framework.decorators import api_view
+from rest_framework.views import APIView, exception_handler
 from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from rest_framework.exceptions import ErrorDetail
 
+from .exceptions import UserValidateError
 from .models import User
 from .serializers import UserSerializer
 
 
 class ValidateUserInputs(APIView):
-    response_data = {'message': ''}
-    status_code = status.HTTP_400_BAD_REQUEST
+    def set_serializer(self, username, password):
+        """
+        Set serializer and check validation 
+        """
+        user_data = {'username': username, 'password': password}
+        self.serializer = UserSerializer(data=user_data)
 
-    def set_and_validate_serializer(self, user_name, password):
-        self.serializer = UserSerializer(data={'user_name': user_name, 'password': password})
-        return self.serializer.is_valid()
-
-    def get_error_list_from_serializer(self):
-        ret_list = []
-        for k, errors in self.serializer.errors.items():
-            for error in errors:
-                if error.code is 'max_length':
-                    error = 'MAX_LENGTH'
-                ret_list.append(error)
-
-        return ret_list
-    
-    def is_user_duplicate(self):
-        return User.objects.filter(user_name=self.serializer.validated_data['user_name']).exists()
+        if not self.serializer.is_valid():
+            raise UserValidateError(self.serializer.errors)
 
 class UserView(ValidateUserInputs):
-    # sign-up user
-    def post(self, request, user_name):
-        if self.set_and_validate_serializer(user_name, request.data['password']):
-            if not self.is_user_duplicate():
-                # Create user and set success respond
-                self.serializer.save()
-                self.status_code = status.HTTP_200_OK
-            else:
-                self.response_data['message'] = "ID is already in use."
-                self.response_data['errors'] = ["ID_EXISTS"]
-        else:
-            self.response_data['message'] = "Invalid input."
-            self.response_data['errors'] = self.get_error_list_from_serializer()
+    success_repond = {'success': True}
+    def post(self, request, username):
+        """
+        User sign-up API
+        """
+        self.set_serializer(username, request.data['password'])
+        if self.serializer.is_user_duplicate():
+            raise UserValidateError(code='exist_username')
 
-        return Response(self.response_data, self.status_code)
+        try:
+            # Create user
+            self.serializer.save()
+            
+        except Exception as e:
+            print("Error!!- ", (e))
+            raise UserValidateError(code='server_error')
 
-    # User duplicate check
-    def get(self, request, user_name):
-        if self.set_and_validate_serializer(user_name, 'tmp'):
-            # Set success respond
-            self.response_data['exists'] = self.is_user_duplicate()
-            self.status_code = status.HTTP_200_OK
-        else:
-            self.response_data['message'] = "Invalid input."  
-            self.response_data['errors'] = self.get_error_list_from_serializer()
+        return Response(self.success_repond)
 
-        return Response(self.response_data, self.status_code)
+    def get(self, request, username):
+        """
+        Username dupclicate check API
+        """
+        self.set_serializer(username, 'goodpassword')
+        self.success_repond['exists'] = self.serializer.is_user_duplicate()
+
+        return Response(self.success_repond)
 
 class LoginView(ValidateUserInputs):
-    def post(self, request, user_name):
-        print("Login")
-        return Response()
+    def post(self, request, username):
+        print(login)
+        raise UserValidateError(code='not_ready')

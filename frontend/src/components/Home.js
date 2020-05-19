@@ -31,12 +31,20 @@ class Home extends Component {
     const errors = err.response.data.errors
     let message = ''
 
+    console.log(err.response) //test
+
     if (errors) {
       const stringErrors = errors.map(element => {
+        console.log(element)
         switch(element) {
-          case 'ID_NOT_PLAIN_TEXT': return 'ID must be ENG or numeric.'
-          case 'INVALID_ID': return 'Unavaliable Id.'
-          case 'PASSWORD_NOT_PLAIN_TEXT': return 'Password must be ENG or numeric.'
+          case 'not_plain_username': return 'ID must be ENG or numeric.'
+          case 'invalid_username': return 'Unavaliable ID.'
+          case 'not_plain_password': return 'Password must be ENG or numeric.'
+          case 'blank_username': return 'ID required.'
+          case 'blank_password': return 'Password required.'
+          case 'min_length_password': return 'Password is at least 4.'
+          case 'max_length_username': return 'ID maximum length: 15'
+          case 'exist_username': return 'ID already used.'
           default: return 'Unknown response.'
         }
       })
@@ -56,7 +64,7 @@ class Home extends Component {
     } else {
       axios.post(`user/${username}/login`, {password})
       .then(res => {
-        console.log('res:', res.data)
+        console.log('login ok')
       })
       .catch(this.handleError)
     }

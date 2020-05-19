@@ -4,6 +4,7 @@ from rest_framework.exceptions import ValidationError
 
 from .models import User, Avatar
 
+
 def valid_plain_text(text):
     reg = re.compile("[^a-zA-Z0-9]")
 
@@ -14,23 +15,31 @@ def has_admin(text):
     return True if reg.search(text) else False
 
 class UserSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(required=True, max_length=15) 
+    password = serializers.CharField(required=True, min_length=4)
+
     class Meta:
         model = User
-        fields = ('user_name', 'password')
-    
-    def validate_user_name(self, value):
+        fields = ('username', 'password')
+
+    def validate_username(self, value):
         if not valid_plain_text(value):
-            raise ValidationError('ID_NOT_PLAIN_TEXT')
+            raise ValidationError(code='not_plain')
+
         if has_admin(value):
-            raise ValidationError('INVALID_ID')
+            raise ValidationError(code='invalid')
+
         return value
     
     def validate_password(self, value):
         if not valid_plain_text(value):
-            raise ValidationError('PASSWORD_NOT_PLAIN_TEXT')
+            raise ValidationError(code='not_plain')
+
         return value
+    def is_user_duplicate(self):
+        return self.Meta.model.objects.filter(username=self.validated_data['username']).exists()
 
 class AvatarSerializer(serializers.ModelSerializer):
     class Meta:
         model = Avatar
-        fileds = ('name', 'owner_name', 'current_map', 'location')
+        fileds = ('name', 'owner_id', 'current_map', 'location')
