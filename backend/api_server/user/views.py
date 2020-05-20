@@ -1,38 +1,38 @@
 from rest_framework import status
-from rest_framework.views import APIView, exception_handler
+from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from rest_framework.exceptions import ErrorDetail
 
-from .exceptions import UserValidateError
 from .models import User
-from .serializers import UserSerializer
+from .exceptions import UserValidateError
+from .serializers import UserSerializer, JWTSerializerWithUser
 
 
 class ValidateUserInputs(APIView):
-    def set_serializer(self, username, password):
+    success_repond = {'success': True}
+
+    def set_user_serializer(self, username, password):
         """
         Set serializer and check validation 
         """
         user_data = {'username': username, 'password': password}
-        self.serializer = UserSerializer(data=user_data)
+        self.user_serializer = UserSerializer(data=user_data)
 
-        if not self.serializer.is_valid():
-            raise UserValidateError(self.serializer.errors)
+        if not self.user_serializer.is_valid():
+            raise UserValidateError(self.user_serializer.errors)
 
 class UserView(ValidateUserInputs):
-    success_repond = {'success': True}
     def post(self, request, username):
         """
         User sign-up API
         """
-        self.set_serializer(username, request.data['password'])
-        if self.serializer.is_user_duplicate():
+        self.set_user_serializer(username, request.data['password'])
+
+        if self.user_serializer.is_user_exist():
             raise UserValidateError(code='exist_username')
 
         try:
             # Create user
-            self.serializer.save()
+            self.user_serializer.save()
             
         except Exception as e:
             print("Error!!- ", (e))
@@ -44,12 +44,20 @@ class UserView(ValidateUserInputs):
         """
         Username dupclicate check API
         """
-        self.set_serializer(username, 'goodpassword')
-        self.success_repond['exists'] = self.serializer.is_user_duplicate()
+        self.set_user_serializer(username, 'goodpassword')
+        self.success_repond['exists'] = self.user_serializer.is_user_exist()
 
         return Response(self.success_repond)
 
 class LoginView(ValidateUserInputs):
     def post(self, request, username):
-        print(login)
-        raise UserValidateError(code='not_ready')
+        self.set_user_serializer(username, request.data['password'])
+        token_serializer = JWTSerializerWithUser(data=self.user_serializer.validated_data)
+
+        if not token_serializer.is_valid():
+            # username, password is not match
+            raise UserValidateError(code='user_auth_fail')
+
+        self.success_repond['token'] = token_serializer.validated_data
+
+        return Response(self.success_repond)

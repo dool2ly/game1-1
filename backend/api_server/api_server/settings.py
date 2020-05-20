@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+import datetime
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -25,7 +26,7 @@ SECRET_KEY = 'l2m*6ze1v#1(&6pvqb$!sg#(d#%t7o%vq79*)vny^*50*3brw-'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost']
+ALLOWED_HOSTS = ['localhost', 'testserver']
 
 
 # Application definition
@@ -127,5 +128,13 @@ STATIC_URL = '/static/'
 CORS_ORIGIN_WHITELIST = ['localhost:80/']
 
 REST_FRAMEWORK = {
-    "EXCEPTION_HANDLER": ("user.exceptions.custom_exception_handler"),
+    'EXCEPTION_HANDLER': ("user.utils.custom_exception_handler"),
 }
+
+JWT_AUTH= {
+    'JWT_PAYLOAD_HANDLER': 'user.utils.custom_jwt_payload_handler',
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=1),
+    'JWT_ALLOW_REFRESH': True,
+    'JWT_ISSUER': 'dool2ly',
+}
+

@@ -4,6 +4,16 @@ from django.urls import reverse
 from .serializers import UserSerializer
 from .models import User
 
+class DevTest(TestCase):
+    def test_1(self):
+        user = User(username='tester01', password='pwd123')
+        user.save()
+
+        url = reverse('user:login', args=('tester01',))
+        res = self.client.post(url, {'password':'pwd123'})
+        # print(res.data)
+
+
 class UserViewInput(TestCase):
     test_username = 'gooduser'
     test_password = 'goodpass'
@@ -95,3 +105,32 @@ class UserViewInput(TestCase):
         
         self.assertIn('exists', response.data)
         self.assertEquals(response.data['exists'], True)
+
+    def test_user_login_ok(self):
+        user = User(username=self.test_username, password=self.test_password)
+        user.save()
+        url = reverse('user:login', args=(self.test_username,))
+        response = self.client.post(url, {'password': self.test_password})
+
+        self.assertIn('token', response.data)
+        self.assertEquals(response.data['success'], True)
+
+    def test_wrong_password_login(self):
+        user = User(username=self.test_username, password=self.test_password)
+        user.save()
+        url = reverse('user:login', args=(self.test_username,))
+        response = self.client.post(url, {'password': 'wrongpassword'})
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('errors', response.data)
+        self.assertIn('user_auth_fail', response.data['errors'])
+    
+    def test_wrong_username_login(self):
+        user = User(username=self.test_username, password=self.test_password)
+        user.save()
+        url = reverse('user:login', args=('wrongusername',))
+        response = self.client.post(url, {'password': self.test_password})
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('errors', response.data)
+        self.assertIn('user_auth_fail', response.data['errors'])

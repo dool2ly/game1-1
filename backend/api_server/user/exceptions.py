@@ -1,5 +1,3 @@
-from rest_framework import status
-from rest_framework.views import exception_handler
 from rest_framework.exceptions import ValidationError
 
 
@@ -19,14 +17,3 @@ class UserValidateError(ValidationError):
         return ret_list
 
 
-def custom_exception_handler(exc, context):
-    """
-    Catch API exceptions and customize response
-    """
-    response = exception_handler(exc, context)
-
-    # check that a UserValidateError exception is raised
-    if isinstance(exc, UserValidateError):
-        response.data={"errors": exc.get_code_list()}
-
-    return response
