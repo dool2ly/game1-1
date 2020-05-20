@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'user',
+    'chat',
 ]
 
 MIDDLEWARE = [
@@ -136,5 +137,6 @@ JWT_AUTH= {
     'JWT_EXPIRATION_DELTA': datetime.timedelta(days=1),
     'JWT_ALLOW_REFRESH': True,
     'JWT_ISSUER': 'dool2ly',
+    'JWT_PRIVATE_KEY': '[---private_key---]',
 }
 

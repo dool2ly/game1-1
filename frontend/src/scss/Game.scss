@@ -1,0 +1,83 @@
+.game {
+    display: flex;
+    height: 100%;
+  }
+  
+  .world {
+    width: 600px;
+    height: 540px;
+    background-color: #c77a35;
+  }
+
+  .chat {
+    height: 160px;
+    display: flex;
+    flex-direction: column;
+    
+    .text-area{
+      flex: 1;
+      background-color: #DEB887;
+      border-top: 5px solid #452000;
+      border-bottom: 2px solid #452000;
+    }
+    .chat-form{
+      display:flex;
+      background: gray;
+      
+      input {
+        font-size: 1.1rem;  
+        flex: 1;
+      }
+      .submit {
+        font-size: 1.1rem;
+        background-color: #452000;
+        color:#cc9a69;
+        font-weight: 600;
+        padding-left: 15px;
+        padding-right: 15px;
+        cursor:pointer;
+        user-select: none;
+      }
+      .submit:hover {
+        background-color: #723908;
+      }
+      .submit:active {
+        background-color: #cc9a69;
+        color: #452000;
+      }
+    }
+  }
+  
+  .gameinfo {
+    width: 200px;
+    background-color: #5e1f02;
+    display: flex;
+    flex-direction: column;
+  
+    .inventory {
+      height: 70%;
+    }
+  
+    .user-info {
+      height: 15%;
+    }
+  
+    .btn-container {
+      display: flex;
+      padding: 5px;
+      height: 15%;
+      flex-direction: column;
+      justify-content: flex-end;
+  
+      .menu-btn {
+        border-radius: 0px;
+        font-size: 1.5rem;
+        height: 40px;
+      }
+  
+      .menu-btn:hover {
+        background-color: #5e1f02;
+      }
+    }
+  }
+  

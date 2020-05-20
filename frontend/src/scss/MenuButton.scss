@@ -16,11 +16,11 @@
   transition:800ms ease all;
 }
 
-.menu-btn:hover{
+.menu-btn:hover {
   background:#452000;
   color: #cc9a69;
 }
-.menu-btn:before,.menu-btn:after{
+.menu-btn:before,.menu-btn:after {
   content:'';
   position:absolute;
   top:0;
@@ -36,7 +36,7 @@
   left:0;
   bottom:0;
 }
-.menu-btn:hover:before,.menu-btn:hover:after{
+.menu-btn:hover:before,.menu-btn:hover:after {
   width:100%;
   transition:800ms ease all;
 }

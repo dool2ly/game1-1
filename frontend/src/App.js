@@ -14,7 +14,7 @@ class App extends Component {
         <div className='app'>
           <Route path='/' exact component={Home} />
           <Route path='/game' component={Game} />
-          <Redirect path='*' to='/' />
+          {/* <Redirect path='*' to='/' /> */}
           <AlertPortal />
         </div>
       </BrowserRouter>

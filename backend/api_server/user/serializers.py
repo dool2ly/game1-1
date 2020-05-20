@@ -45,12 +45,6 @@ class UserSerializer(serializers.ModelSerializer):
     def is_user_exist(self):
         return self.Meta.model.objects.filter(username=self.validated_data['username']).exists()
 
-    def is_user_password_match(self):
-        user = self.Meta.model.objects.get(username=self.validated_data['username'])
-        recv_pw = self.validated_data['password']
-        return user.password == recv_pw
-
-
 class AvatarSerializer(serializers.ModelSerializer):
     class Meta:
         model = Avatar

@@ -1,10 +1,18 @@
 import React from 'react'
 
+import '../scss/Game.scss'
+import Chat from './Chat'
+import World from './World'
+import GameInfo from './GameInfo'
+
 function Game() {
   return (
     <div className='game'>
-      Game component
-      {console.log('hihi in game')}
+      <div>
+      <World />
+        <Chat />
+      </div>
+      <GameInfo />
     </div>
   )
 }

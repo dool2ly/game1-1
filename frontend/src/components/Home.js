@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import '../scss/Home.scss'
 import * as elements from './Elements.js'
 import { createAlert } from '../actions/AlertPortal'
+import { loginSuccess } from '../actions/User'
 
 
 class Home extends Component {
@@ -56,7 +57,7 @@ class Home extends Component {
 
   handleLogin = () => {
     const { username, password } = this.state
-    const { createAlert } = this.props
+    const { createAlert, loginSuccess } = this.props
     const title = 'Login'
 
     if (!username || !password) {
@@ -64,7 +65,8 @@ class Home extends Component {
     } else {
       axios.post(`user/${username}/login`, {password})
       .then(res => {
-        console.log('login ok')
+        loginSuccess(res.data.token)
+        this.props.history.push('/game')
       })
       .catch(this.handleError)
     }
@@ -90,21 +92,24 @@ class Home extends Component {
     }
   }
 
-  handleSignup = () => {
+  handleSignup = async () => {
     const { username, password } = this.state
-    const { createAlert } = this.props
+    const { createAlert, loginSuccess } = this.props
     const title = 'Sign-up'
 
     if (!username || !password) {
       createAlert({ title, message: 'Empty input.' })
     } else {
-      // Create user
-      axios.post('user/' + username, { password })
-      .then(res => {
-        createAlert({ title, message: 'Welcome ' + username})
+      try {
+        // Login after sign-up
+        await axios.post('user/' + username, { password })
+        const res = await axios.post(`user/${username}/login`, { password })
+        loginSuccess(res.data.token)
+        createAlert({ title, message: `Successfully registerd.\nWelcome ${username} !`})
         this.props.history.push('/game')
-      })
-      .catch(this.handleError)
+      } catch (err) {
+        this.handleError(err)
+      }
     }
   }
 
@@ -204,4 +209,4 @@ class Home extends Component {
   }
 }
 
-export default connect(null, { createAlert })(Home)
+export default connect(null, { createAlert, loginSuccess })(Home)

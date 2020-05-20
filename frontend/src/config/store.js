@@ -1,10 +1,12 @@
 import { createStore, combineReducers } from 'redux'
 
 import portal from '../reducers/AlertPortal'
+import user from '../reducers/User'
 
 
 const rootReducer = combineReducers({
-    portal: portal
+    portal: portal,
+    user: user
 })
 
 const store = createStore(
