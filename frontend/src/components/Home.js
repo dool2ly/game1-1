@@ -46,6 +46,7 @@ class Home extends Component {
           case 'min_length_password': return 'Password is at least 4.'
           case 'max_length_username': return 'ID maximum length: 15'
           case 'exist_username': return 'ID already used.'
+          case 'user_auth_fail': return 'Incorrect user information.'
           default: return 'Unknown response.'
         }
       })

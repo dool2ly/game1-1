@@ -9,7 +9,7 @@ function Game() {
   return (
     <div className='game'>
       <div>
-      <World />
+        <World />
         <Chat />
       </div>
       <GameInfo />

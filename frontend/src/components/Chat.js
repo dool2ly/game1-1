@@ -1,23 +1,26 @@
 import React, { Component } from 'react'
 
-class Chat extends Component {
-  state = {
-    message: ''
+import WebSocketInstance from './WebSocket'
+
+export default class Chat extends Component {
+  // ws = new WebSocket('ws://localhost:8000/ws/chat')
+  ws = new WebSocket('ws://localhost:8000/ws/chat/test_room')
+
+  componentDidMount() {
+    this.ws.onopen = () => {
+      console.log('ws connected')
+    }
+
+    this.ws.onclose = () => {
+      console.log('ws disconnected')
+    }
+  }
+  handleTest = () => {
+    console.log('test btn')
   }
 
-  inputChange = (e) => {
-    this.setState({
-      [e.target.name]: e.target.value
-    })
-  }
-
-  handleOnSubmit= () => {
-    console.log('test')
-    console.log(this.state.message)
-  }
-  
   render() {
-    const { handleOnSubmit } = this
+    const { handleOnSubmit, handleTest } = this
     return (
       <div className='chat'>
         <div className='text-area'>
@@ -27,10 +30,12 @@ class Chat extends Component {
           <input
             type='text'
             name='message'
-            
             placeholder='Type a Message'
             required
           />
+          <div className='test-submit' onClick={handleTest}>
+            Test
+          </div>
           <div className='submit' onClick={handleOnSubmit}>
             Send
           </div>
@@ -38,7 +43,4 @@ class Chat extends Component {
       </div>
     )
   }
-  
 }
-
-export default Chat

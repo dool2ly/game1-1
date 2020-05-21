@@ -26,7 +26,7 @@ SECRET_KEY = 'l2m*6ze1v#1(&6pvqb$!sg#(d#%t7o%vq79*)vny^*50*3brw-'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', 'testserver']
+ALLOWED_HOSTS = ['localhost', 'testserver', '49.247.192.202']
 
 
 # Application definition
@@ -38,8 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'user',
+    'channels',
     'chat',
+    'user',
 ]
 
 MIDDLEWARE = [
@@ -140,3 +141,13 @@ JWT_AUTH= {
     'JWT_PRIVATE_KEY': '[---private_key---]',
 }
 
+ASGI_APPLICATION = 'api_server.routing.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('127.0.0.1', 6379)],
+        },
+    }
+}

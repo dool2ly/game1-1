@@ -45,15 +45,28 @@
         background-color: #cc9a69;
         color: #452000;
       }
+
+      .test-submit {
+        font-size: 1.1rem;
+        background-color: #452000;
+        color:#cc9a69;
+        font-weight: 600;
+        padding-left: 15px;
+        padding-right: 15px;
+        cursor:pointer;
+        user-select: none;
+      }
+      
     }
   }
   
-  .gameinfo {
+  .game-info {
     width: 200px;
-    background-color: #5e1f02;
+    background-color: #bd592a;
     display: flex;
     flex-direction: column;
-  
+    border-left: 5px solid #452000;
+
     .inventory {
       height: 70%;
     }
