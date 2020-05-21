@@ -1,28 +1,45 @@
-import React, { Component } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
+import { connect } from 'react-redux'
 
-import WebSocketInstance from './WebSocket'
+import { BACKEND_WS } from '../config/constants'
 
-export default class Chat extends Component {
-  // ws = new WebSocket('ws://localhost:8000/ws/chat')
-  ws = new WebSocket('ws://localhost:8000/ws/chat/test_room')
+function Chat(props) {
+  const [message, setMessage] = useState('')
+  const webSocket = useRef(null)
 
-  componentDidMount() {
-    this.ws.onopen = () => {
-      console.log('ws connected')
+  useEffect(() => {
+    webSocket.current = new WebSocket(BACKEND_WS + 'ws/chat/1', props.token)
+
+    webSocket.current.onopen = () => {
+      console.log('chat server connected')
     }
 
-    this.ws.onclose = () => {
-      console.log('ws disconnected')
+    webSocket.current.onmessage = (e) => {
+      console.log('recv:', e.data)
     }
-  }
-  handleTest = () => {
-    console.log('test btn')
+
+    webSocket.current.onclose = () => {
+      console.log('chat server disconnected')
+    }
+
+    return () => webSocket.current.close()
+  }, [])
+
+  const inputChange = (e) => {
+    setMessage(e.target.value)
   }
 
-  render() {
-    const { handleOnSubmit, handleTest } = this
-    return (
-      <div className='chat'>
+  const handleTest = () => {
+    console.log(props.token)
+  }
+
+  const handleOnSubmit = () => {
+    console.log('submitHandle')
+    webSocket.current.send(JSON.stringify({ message }))
+  }
+
+  return (
+    <div className='chat'>
         <div className='text-area'>
           chatings
         </div>
@@ -31,6 +48,7 @@ export default class Chat extends Component {
             type='text'
             name='message'
             placeholder='Type a Message'
+            onChange={inputChange}
             required
           />
           <div className='test-submit' onClick={handleTest}>
@@ -41,6 +59,12 @@ export default class Chat extends Component {
           </div>
         </div>
       </div>
-    )
+  )
+}
+
+const mapStateToProps = (state) => {
+  return {
+    ...state.user
   }
 }
+export default connect(mapStateToProps)(Chat)

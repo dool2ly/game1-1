@@ -21,6 +21,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+# this key used in djangorestframework-jwt(default)
 SECRET_KEY = 'l2m*6ze1v#1(&6pvqb$!sg#(d#%t7o%vq79*)vny^*50*3brw-'
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -40,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'channels',
     'chat',
-    'user',
+    'api',
 ]
 
 MIDDLEWARE = [
@@ -127,18 +128,18 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-CORS_ORIGIN_WHITELIST = ['localhost:80/']
+# CORS_ORIGIN_WHITELIST = ['localhost:80/']
+# CORS_ORIGIN_ALLOW_ALL = True
 
 REST_FRAMEWORK = {
-    'EXCEPTION_HANDLER': ("user.utils.custom_exception_handler"),
+    'EXCEPTION_HANDLER': ("api.utils.custom_exception_handler"),
 }
 
 JWT_AUTH= {
-    'JWT_PAYLOAD_HANDLER': 'user.utils.custom_jwt_payload_handler',
+    'JWT_PAYLOAD_HANDLER': 'api.utils.custom_jwt_payload_handler',
     'JWT_EXPIRATION_DELTA': datetime.timedelta(days=1),
     'JWT_ALLOW_REFRESH': True,
     'JWT_ISSUER': 'dool2ly',
-    'JWT_PRIVATE_KEY': '[---private_key---]',
 }
 
 ASGI_APPLICATION = 'api_server.routing.application'

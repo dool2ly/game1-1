@@ -11,10 +11,15 @@ export const MenuTitle = (text) => (
 )
 
 export const Forms = (key, dataList) => {
-  const formList = dataList.map(({ name, placeholder, onChange, onSubmit, text, type }) => (
-    <div key={key + name} className='form'>
-      <input name={name} placeholder={placeholder} onChange={onChange} type={type}/>
-      {text && ButtonInMenu(key + text, text, onSubmit)}
+  const formList = dataList.map(data => (
+    <div key={key + data.name} className='form'>
+      <input autoComplete="off"
+        name={data.name}
+        placeholder={data.placeholder}
+        onChange={data.onChange}
+        type={data.type}
+      />
+      {data.text && ButtonInMenu(key + data.text, data.text, data.onSubmit)}
     </div>
   ))
 

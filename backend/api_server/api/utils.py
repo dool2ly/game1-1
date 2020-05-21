@@ -22,6 +22,10 @@ def custom_exception_handler(exc, context):
 def custom_jwt_payload_handler(user):
     """
     Customized djangorestframework-jwt jwt_payload_handler
+    validated_data =  {
+            'token': token,
+            'user': user_model
+        }
     """
     username_field = 'username'
     username = user.username

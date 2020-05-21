@@ -15,7 +15,7 @@ class WebSocketService {
   }
 
   connect() {
-    const path = 'ws://localhost:8000/ws/chat';
+    const path = 'ws://localhost:8000/ws/chat/test_room';
     this.socketRef = new WebSocket(path);
     this.socketRef.onopen = () => {
       console.log('WebSocket open');
@@ -77,7 +77,7 @@ class WebSocketService {
     return this.socketRef.readyState;
   }
 
-   waitForSocketConnection(callback){
+  waitForSocketConnection(callback){
     const socket = this.socketRef;
     const recursion = this.waitForSocketConnection;
     setTimeout(

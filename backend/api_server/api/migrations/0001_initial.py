@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=10)),
                 ('current_map', models.IntegerField(default=0)),
                 ('location', django.contrib.postgres.fields.ArrayField(base_field=models.IntegerField(), size=2)),
-                ('owner_name', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='user.User')),
+                ('owner_name', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='api.User')),
             ],
         ),
     ]

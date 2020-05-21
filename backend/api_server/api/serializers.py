@@ -1,6 +1,7 @@
 import re
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
+from rest_framework_jwt.serializers import VerifyJSONWebTokenSerializer
 
 from .models import User, Avatar
 from rest_framework_jwt.settings import api_settings
@@ -68,3 +69,24 @@ class JWTSerializerWithUser(serializers.Serializer):
         payload = jwt_payload_handler(user)
 
         return jwt_encode_handler(payload)
+
+
+class VerifyJWTSerializerWithUser(VerifyJSONWebTokenSerializer):
+    class Meta:
+        model = User
+        
+    def _check_user(self, payload):
+        username = jwt_get_username_from_payload(payload)
+
+        if not username:
+            msg = _('Invalid payload.')
+            raise ValidationError(msg)
+
+        # Make sure user exists
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            msg = _("User doesn't exist.")
+            raise ValidationError(msg)
+
+        return user

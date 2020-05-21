@@ -9,13 +9,17 @@ import { loginSuccess } from '../actions/User'
 
 
 class Home extends Component {
-  state = {
-    username: '',
-    password: '',
-    menuWidth: 0,
-    menuHeight: 0,
-    contents: []
+  constructor(props) {
+    super(props)
+    this.state = {
+      username: '',
+      password: '',
+      menuWidth: 0,
+      menuHeight: 0,
+      contents: []
+    }
   }
+
 
   componentDidMount() {
     this.setHomeState()
@@ -64,7 +68,7 @@ class Home extends Component {
     if (!username || !password) {
       createAlert({ title, message: 'Empty input.' })
     } else {
-      axios.post(`user/${username}/login`, {password})
+      axios.post(`api/user/${username}/login`, {password})
       .then(res => {
         loginSuccess(res.data.token)
         this.props.history.push('/game')
@@ -81,7 +85,8 @@ class Home extends Component {
     if (!username) {
       createAlert({ title, message: 'Empty input.'})
     } else {
-      axios.get('user/' + username)
+      // axios.get('api/user/' + username)
+      axios.get('api/user/' + username)
       .then(res => {
         if (res.data.exists) {
           createAlert({ title, message: 'ID is already in use.'})
@@ -103,8 +108,8 @@ class Home extends Component {
     } else {
       try {
         // Login after sign-up
-        await axios.post('user/' + username, { password })
-        const res = await axios.post(`user/${username}/login`, { password })
+        await axios.post('api/user/' + username, { password })
+        const res = await axios.post(`api/user/${username}/login`, { password })
         loginSuccess(res.data.token)
         createAlert({ title, message: `Successfully registerd.\nWelcome ${username} !`})
         this.props.history.push('/game')
