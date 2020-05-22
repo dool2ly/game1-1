@@ -7,14 +7,15 @@ function Chat(props) {
   const [message, setMessage] = useState('')
   const [messages, setMessages] = useState([])
   const webSocket = useRef(null)
-  const maxLength = 5
+  const maxLength = 6
 
   useEffect(() => {
     webSocket.current = new WebSocket(BACKEND_WS + 'ws/chat/1', props.token)
     // newMessageRef.currnet = newMessage
 
     webSocket.current.onopen = () => {
-      console.log('chat server connected')
+      const alertMsg = "Chat server connected."
+      setMessages([{'from':'System', 'message': alertMsg}])
     }
 
     webSocket.current.onmessage = (e) => {
@@ -30,8 +31,8 @@ function Chat(props) {
     }
 
     webSocket.current.onclose = () => {
-      // TODO: please retry message
-      console.log('chat server disconnected')
+      const errorMsg = "Chat server disconnected, please restart."
+      setMessages([{'from':'System Error', 'message': errorMsg}])
     }
 
     return () => webSocket.current.close()
@@ -48,7 +49,9 @@ function Chat(props) {
   }
 
   const handleOnSubmit = () => {
-    webSocket.current.send(JSON.stringify({ message }))
+    if (webSocket.current.readyState === 1) {
+      webSocket.current.send(JSON.stringify({ message }))
+    }
     setMessage('')
   }
 

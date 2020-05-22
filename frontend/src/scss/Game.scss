@@ -5,7 +5,7 @@
   
   .world {
     width: 600px;
-    height: 540px;
+    height: 440px;
     background-color: #c77a35;
   }
 
@@ -22,13 +22,10 @@
 
       ul {
         margin: 0;
-        padding: 3px;
-        font-size: 1.1rem;
+        padding: 0px;
+        padding-left: 2px;
+        font-size: 1rem;
         list-style: none;
-
-        li {
-          display:flex;
-        }
         span {
           font-weight: 600;
         }
@@ -39,7 +36,7 @@
       background: gray;
       
       input {
-        font-size: 1.1rem;  
+        font-size: 1rem;  
         flex: 1;
       }
       .submit {

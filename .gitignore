@@ -28,9 +28,9 @@
 /backend/*~
 /backend/api_server/api_server/__pycache__
 /backend/api_server/api/__pycache__
-/backend/api_server/chat/__pycache__
+/backend/api_server/game/__pycache__
 /backend/api_server/api/migrations/__pycache__/
-/backend/api_server/chat/migrations/__pycache__/
+/backend/api_server/game/migrations/__pycache__/
 /backend/static
 /backend/.DS_Store
 /backend/api_server/run

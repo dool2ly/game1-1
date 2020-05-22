@@ -10,10 +10,5 @@ application = ProtocolTypeRouter({
         URLRouter(
             chat.routing.websocket_urlpatterns
         )
-    ),
-    '11token': TokenAuthMiddlewareStack(
-        URLRouter(
-            chat.routing.websocket_urlpatterns
-        )
     )
 })
