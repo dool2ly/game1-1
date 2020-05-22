@@ -1,4 +1,15 @@
 @import 'MenuButton';
+@keyframes popUp {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
 
 .home {
   height: 100%;
@@ -16,6 +27,7 @@
     align-items: center;
     box-shadow: 0 5px 10px rgba(0,0,0,0.16), 0 5px 10px rgba(0,0,0,0.23);
     transition: 800ms ease all;
+    animation: 300ms ease-out popUp;
 
     .menu-btn {
       height: 100px;

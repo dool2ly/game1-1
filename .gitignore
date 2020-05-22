@@ -27,8 +27,10 @@
 /backend/*.pyc
 /backend/*~
 /backend/api_server/api_server/__pycache__
-/backend/api_server/user/__pycache__
-/backend/api_server/user/migrations/__pycache__/
+/backend/api_server/api/__pycache__
+/backend/api_server/chat/__pycache__
+/backend/api_server/api/migrations/__pycache__/
+/backend/api_server/chat/migrations/__pycache__/
 /backend/static
 /backend/.DS_Store
 /backend/api_server/run

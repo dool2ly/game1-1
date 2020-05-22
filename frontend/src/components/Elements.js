@@ -13,7 +13,8 @@ export const MenuTitle = (text) => (
 export const Forms = (key, dataList) => {
   const formList = dataList.map(data => (
     <div key={key + data.name} className='form'>
-      <input autoComplete="off"
+      <input
+        autoComplete="off"
         name={data.name}
         placeholder={data.placeholder}
         onChange={data.onChange}
