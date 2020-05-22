@@ -3,7 +3,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework_jwt.serializers import VerifyJSONWebTokenSerializer
 
-from .models import User, Avatar
+from .models import User
 from rest_framework_jwt.settings import api_settings
 
 jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
@@ -46,10 +46,6 @@ class UserSerializer(serializers.ModelSerializer):
     def is_user_exist(self):
         return self.Meta.model.objects.filter(username=self.validated_data['username']).exists()
 
-class AvatarSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Avatar
-        fileds = ('name', 'owner_id', 'current_map', 'location')
 
 class JWTSerializerWithUser(serializers.Serializer):
     username = serializers.CharField(required=True, max_length=15) 

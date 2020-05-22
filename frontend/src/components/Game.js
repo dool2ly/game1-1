@@ -6,7 +6,6 @@ import World from './World'
 import GameInfo from './GameInfo'
 
 function Game() {
-  // TODO: Token authrization from server
   return (
     <div className='game'>
       <div>

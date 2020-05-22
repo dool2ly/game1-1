@@ -3,8 +3,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from .models import User
+from game.models import Avatar
 from .exceptions import UserValidateError
 from .serializers import UserSerializer, JWTSerializerWithUser
+
 
 
 class ValidateUserInputs(APIView):
@@ -33,6 +35,16 @@ class UserView(ValidateUserInputs):
         try:
             # Create user
             self.user_serializer.save()
+
+            # Create avatar
+            print(self.user_serializer.instance)
+            user_avatar = Avatar(
+                name=self.user_serializer.validated_data['username'],
+                owner=self.user_serializer.instance,
+                current_map = 0,
+                location=[0,0])
+
+            user_avatar.save()
             
         except Exception as e:
             print("Error!!- ", (e))

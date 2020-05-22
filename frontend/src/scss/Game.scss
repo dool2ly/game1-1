@@ -4,9 +4,20 @@
   }
   
   .world {
+    position: relative;
     width: 600px;
     height: 440px;
     background-color: #c77a35;
+
+    .avatar span {
+      position: relative;
+      top: 60px;
+      left: -5px;
+      background: #d1ab89;
+      padding-left: 5px;
+      padding-right: 5px;
+      border-radius: 4px;
+    }
   }
 
   .chat {

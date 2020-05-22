@@ -1,3 +1,13 @@
 from django.db import models
+from django.contrib.postgres.fields import ArrayField
 
-# Create your models here.
+from api.models import User
+
+class Avatar(models.Model):
+    name = models.CharField(max_length=10, unique=True)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    current_map = models.IntegerField(default=0)
+    location = ArrayField(models.IntegerField(default=0), size=2)
+
+    def __str__(self):
+        return self.name
