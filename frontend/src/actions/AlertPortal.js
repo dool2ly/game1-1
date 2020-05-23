@@ -7,18 +7,9 @@ import { CREATE_ALERT, CLOSE_ALERT } from '../config/constants'
     }
   }
   
-  export const closeAlert = () => {
+  export const closeAlert = (from) => {
     return {
-      type: CLOSE_ALERT
+      type: CLOSE_ALERT,
+      payload: from
     }
-  }
-
-  export const createAlert2 = (contents) => {
-    return (dispatch, getState) => {
-      dispatch({
-        type: CREATE_ALERT,
-        payload: contents
-      })
-    }
-
   }

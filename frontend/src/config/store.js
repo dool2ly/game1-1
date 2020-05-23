@@ -2,11 +2,13 @@ import { createStore, combineReducers } from 'redux'
 
 import portal from '../reducers/AlertPortal'
 import user from '../reducers/User'
+import chat from '../reducers/ChatBubble'
 
 
 const rootReducer = combineReducers({
     portal: portal,
-    user: user
+    user: user,
+    chat: chat
 })
 
 const store = createStore(

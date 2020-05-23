@@ -2,13 +2,18 @@ import React, { useState, useEffect, useRef } from 'react'
 import { connect } from 'react-redux'
 
 import { BACKEND_WS } from '../config/constants'
+import { createChat, closeChat } from '../actions/ChatBubble'
 
 function Chat(props) {
-  const maxLength = 6
+  const maxLength = 20
   const webSocket = useRef(null)
+  const messageEnd = useRef(null)
   const [message, setMessage] = useState('')
   const [messages, setMessages] = useState([])
+
   
+  
+
   // ComponentDidMount
   useEffect(() => {
     if (props.token) {
@@ -23,14 +28,22 @@ function Chat(props) {
   
       webSocket.current.onmessage = (e) => {
         // Recieve data from backend, update data to messages
+        const parsedData = JSON.parse(e.data)
         setMessages(prev => {
-          const parsedData = JSON.parse(e.data)
-  
+          
           if (prev.length === maxLength) {
             return [...prev.slice(1), parsedData]
           }
           return [...prev, parsedData]
+          
         })
+        
+        props.createChat(
+          parsedData,
+          setTimeout(() => props.closeChat(parsedData['from']), 3000)
+        )
+        
+        scrollToBottm()
       }
   
       webSocket.current.onclose = () => {
@@ -65,6 +78,10 @@ function Chat(props) {
     setMessage('')
   }
 
+  const scrollToBottm = () => {
+    messageEnd.current.scrollIntoView({ behavior: 'smooth' })
+  }
+
   return (
     <div className='chat'>
         <div className='text-area'>
@@ -76,6 +93,10 @@ function Chat(props) {
               </li>
             ))}
           </ul>
+          <div
+            style={{ float:"left", clear: "both" }}
+            ref={(el) => { messageEnd.current = el }}
+          />
         </div>
         <div className='chat-form' >
           <input
@@ -103,4 +124,4 @@ const mapStateToProps = (state) => {
   }
 }
 
-export default connect(mapStateToProps)(Chat)
+export default connect(mapStateToProps, { createChat,closeChat })(Chat)

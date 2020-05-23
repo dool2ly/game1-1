@@ -8,7 +8,7 @@ function World(props) {
   // TODO: Token authrization from server, fail:redirect, success:game
   // TODO: Connect websocket to Game server and add avatar, World
   
-  // const testToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiNjEiLCJ1c2VybmFtZSI6ImMxMjMiLCJleHAiOjE1OTAyNzcwODIsIm9yaWdfaWF0IjoxNTkwMTkwNjgyLCJpc3MiOiJkb29sMmx5In0.rUFQ9AXo0EbLcY9wlCzv6mca9C91DH66CN1h_PMrx5M'
+  // const testToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiNjEiLCJ1c2VybmFtZSI6ImMxMjMiLCJleHAiOjE1OTAzMDAyNDIsIm9yaWdfaWF0IjoxNTkwMjEzODQyLCJpc3MiOiJkb29sMmx5In0.cHv8bDaE0228BMHGxw8agsDprpT4XwZyBElLB8UhXQw'
   const testToken = props.token
 
   const webSocket = useRef(null)
@@ -88,7 +88,9 @@ function World(props) {
   }
 
   function testBtn() {
-    console.log(avatars)
+    const command = 'test'
+    const data = '1'
+    webSocket.current.send(JSON.stringify({ command, data }))
   }
 
   return (
@@ -96,8 +98,8 @@ function World(props) {
       {avatars && avatars.map((avatar, i) => (
         <Avatar key={i} pos={avatar['location']} name={avatar['avatar']} />
       ))}
-      <Avatar pos={[100,100]} name='tester' />
-      <button onClick={testBtn} style={{position: 'relative', top: 100}}>test</button>
+      {/* <Avatar pos={[100,100]} name='tester' /> */}
+      {/* <button onClick={testBtn} style={{position: 'relative', top: 100}}>test</button> */}
     </div>
   )
 }

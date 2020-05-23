@@ -9,14 +9,40 @@
     height: 440px;
     background-color: #c77a35;
 
-    .avatar span {
-      position: relative;
+    .avatar .name-plate {
+      position: absolute;
       top: 60px;
-      left: -5px;
+      // left: -5px;
       background: #d1ab89;
-      padding-left: 5px;
-      padding-right: 5px;
-      border-radius: 4px;
+      // padding-left: 5px;
+      // padding-right: 5px;
+      // border-radius: 4px;
+    }
+
+    .avatar .chat-bubble {
+      padding: 3px;
+
+      max-width: 120px;
+      word-wrap:break-word;
+      position: absolute;
+      background-color: #eee;
+      bottom: 80px;
+      span {
+        font-weight: 600;
+      }
+    }
+    .avatar .chat-bubble:after {
+      position: absolute;
+      display: block;
+      content: "";  
+      border-color: #eee transparent transparent transparent;
+      border-style: solid;
+      border-width: 10px;
+      height:0;
+      width:0;
+      position:absolute;
+      bottom:-19px;
+      left: 10px;
     }
   }
 
@@ -30,6 +56,8 @@
       background-color: #DEB887;
       border-top: 5px solid #452000;
       border-bottom: 2px solid #452000;
+      overflow:auto;
+
 
       ul {
         margin: 0;

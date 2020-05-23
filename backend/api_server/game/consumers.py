@@ -3,6 +3,8 @@ import copy
 
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from .serializers import AvatarSerializer
+from .models import Avatar
+
 
 
 class ChatConsumer(AsyncJsonWebsocketConsumer):
@@ -77,13 +79,17 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
 
         # Accept websocket sub protocol
         self.is_connect = True
+        self.avatar_queryset.active = True
+        self.avatar_queryset.save()
         await self.accept(self.scope['validated']['token'])
 
         # Send avatar initial location
-        await self.send_avatar_to_group()
+        for i in  Avatar.objects.filter(active=True):
+            await self.send_avatar_to_group(i.name, i.location)
 
     async def disconnect(self, close_code):
-        # TODO: avatar information save
+        self.avatar_queryset.active = False
+        self.avatar_queryset.save()
         pass
 
     async def receive_json(self, text_data):
@@ -95,14 +101,19 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
         except KeyError:
             pass
 
-    async def send_avatar_to_group(self):
+    async def send_avatar_to_group(self, name=None, location=None):
         '''
         Send avatar location to group 
         '''
+        if not name:
+            name = self.avatar_name
+        if not location:
+            location = self.avatar_queryset.location
+
         group_event = {
             'type': 'send_avatar',
-            'location': self.avatar_queryset.location,
-            'avatar': self.avatar_name
+            'avatar': name,
+            'location': location
         }
 
         await self.channel_layer.group_send(self.group_name, group_event)
@@ -127,10 +138,21 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
 
             if self.is_possible_location(new_location):
                 self.avatar_queryset.location = new_location
-                print(self.avatar_queryset.location)
+                self.avatar_queryset.save()
                 await self.send_avatar_to_group()
             else:
                 return
+        
+        elif command == 'test':
+            print("ho")
+            self.test_2()
+    
+    def test_2(self):
+        pass
+        
+
+
+
     
     def get_new_location(self, direction):
         new_location = copy.deepcopy(self.avatar_queryset.location)
