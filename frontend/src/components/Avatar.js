@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 
 import { OBJECT_WIDTH, OBJECT_HEIGHT } from '../config/constants'

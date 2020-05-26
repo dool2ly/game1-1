@@ -1,11 +1,18 @@
-import { LOGIN_SUCCESS } from '../config/constants'
+import { LOGIN, LOGOUT } from '../config/constants'
 
-export const loginSuccess = (token) => {
+export const login = (token) => {
     return {
-      type: LOGIN_SUCCESS,
+      type: LOGIN,
       payload: {
         token
       }
     }
+}
+
+// export const logout = () => {type: LOGOUT}
+
+export const logout = () => {
+  return {
+    type: LOGOUT
   }
-  
+}

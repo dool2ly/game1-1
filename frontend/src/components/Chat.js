@@ -10,13 +10,14 @@ function Chat(props) {
   const messageEnd = useRef(null)
   const [message, setMessage] = useState('')
   const [messages, setMessages] = useState([])
+  const { token, createChat, closeChat } = props
 
 
   // ComponentDidMount
   useEffect(() => {
-    if (props.token) {
+    if (token) {
       // Websocket connection attempt
-      webSocket.current = new WebSocket(BACKEND_WS + 'ws/chat/1', props.token)
+      webSocket.current = new WebSocket(BACKEND_WS + 'ws/chat/1', token)
   
       webSocket.current.onopen = () => {
         // Websocket connection success
@@ -36,9 +37,9 @@ function Chat(props) {
           
         })
         
-        props.createChat(
+        createChat(
           parsedData,
-          setTimeout(() => props.closeChat(parsedData['from']), 3000)
+          setTimeout(() => closeChat(parsedData['from']), 3000)
         )
         
         scrollToBottm()
@@ -57,7 +58,7 @@ function Chat(props) {
       setMessages([{'from':'System Error', 'message': errorMsg}])
     }
 
-  }, [])
+  }, [token,createChat, closeChat])
 
   const inputChange = (e) => {
     setMessage(e.target.value)

@@ -1,4 +1,4 @@
-import { LOGIN_SUCCESS } from '../config/constants'
+import { LOGIN, LOGOUT } from '../config/constants'
 
 const initialState = {
   token: null
@@ -6,9 +6,13 @@ const initialState = {
 
 const userReducer = (state = initialState, action) => {
   switch(action.type) {
-    case LOGIN_SUCCESS:
+    case LOGIN:
       return {
         ...action.payload
+      }
+    case LOGOUT:
+      return {
+        token: null
       }
     default:
       return state

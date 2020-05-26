@@ -131,28 +131,25 @@
     z-index:2;
 
     .inventory {
-      height: 70%;
+      height: 60%;
+      background-color:rgb(189, 187, 187);
     }
   
     .user-info {
-      height: 15%;
+      height: 25%;
+      background-color: rgb(146, 145, 145);
     }
   
     .btn-container {
       display: flex;
       padding: 5px;
-      height: 15%;
-      flex-direction: column;
-      justify-content: flex-end;
-  
+      flex:1;
+      flex-wrap: wrap-reverse;
+      background-color:#452000;
+      
       .menu-btn {
-        border-radius: 0px;
-        font-size: 1.5rem;
-        height: 40px;
-      }
-  
-      .menu-btn:hover {
-        background-color: #5e1f02;
+        height: 50%;
+        width: 100%;
       }
     }
   }

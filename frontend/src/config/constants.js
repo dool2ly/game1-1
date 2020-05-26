@@ -6,7 +6,9 @@ export const CREATE_CHAT = 'CREATE_CHAT'
 
 export const CLOSE_CHAT = 'CLOSE_CHAT'
 
-export const LOGIN_SUCCESS = 'LOGIN_SUCCESS'
+export const LOGIN = 'LOGIN'
+
+export const LOGOUT = 'LOGOUT'
 
 export const BACKEND_WS = 'ws://49.247.192.202:82/'
 

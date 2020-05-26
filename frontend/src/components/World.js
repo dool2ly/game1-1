@@ -1,22 +1,22 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { connect } from 'react-redux'
+import { Redirect } from 'react-router-dom'
 
 import { BACKEND_WS, OBJECT_WIDTH, OBJECT_HEIGHT } from '../config/constants'
+import { createAlert } from '../actions/AlertPortal'
 import Avatar from './Avatar'
 
 function World(props) {
-  // const testToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiNzAiLCJ1c2VybmFtZSI6ImRvb2wybHkxMjM0IiwiZXhwIjoxNTkwMzkxMDYyLCJvcmlnX2lhdCI6MTU5MDMwNDY2MiwiaXNzIjoiZG9vbDJseSJ9.jxRif1ljplH-mXVgr5cpv4e-UpBuQgmkh8nbqhIAkgk'
-  const testToken = props.token
-
   const webSocket = useRef(null)
-  // ex) [{'name':'avatarName', 'location': [x,y]}, ...]
-  const [avatars, setAvatars] = useState([])
+  const { gameCommandRef, token, createAlert } = props
+  const [avatars, setAvatars] = useState([])// ex) [{'name':'avatarName', 'location': [x,y]}, ...]
+  const [toHome, setToHome] = useState(false)
 
   // ComponentDidMount
   useEffect(() => {
-    if (testToken) {
+    if (token) {
       // Websocket connection attempt
-      webSocket.current = new WebSocket(BACKEND_WS + 'ws/game', testToken)
+      webSocket.current = new WebSocket(BACKEND_WS + 'ws/game', token)
 
       webSocket.current.onmessage = (e) => {
         const jsonData = JSON.parse(e.data)
@@ -33,16 +33,17 @@ function World(props) {
       webSocket.current.onclose = () => {
         // Websocket connection close
         console.log('disconnected game server')
-        // TODO: redirect to Home, alert error message
+        setToHome(true)
       }
 
-      props.gameCommandRef.current = handleGameCommand
+      gameCommandRef.current = handleGameCommand
   
       return () => webSocket.current.close() 
     } else {
-      // TODO: redirect to Home, alert login message
+      // if does not have a token, redirect to home
+      setToHome(true)
     }
-  }, [])
+  }, [gameCommandRef, token])
 
   const handleAvatar = (data) => { 
     //Convert server base position to client base position
@@ -62,6 +63,8 @@ function World(props) {
           prv.filter(info => info.name !== data['name'])
         ))
         break
+      default:
+        return
     }
   }
 
@@ -93,6 +96,7 @@ function World(props) {
       {avatars && avatars.map((avatar, i) => (
         <Avatar key={i} pos={avatar['location']} name={avatar['name']} />
       ))}
+      {toHome && <Redirect to='/' />}
     </div>
   )
 }
@@ -102,4 +106,4 @@ const mapStateToProps = (state) => {
     ...state.user
   }
 }
-export default connect(mapStateToProps)(World)
+export default connect(mapStateToProps, { createAlert })(World)

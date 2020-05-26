@@ -3,9 +3,9 @@ import axios from 'axios'
 import { connect } from 'react-redux'
 
 import '../scss/Home.scss'
-import * as elements from './Elements.js'
+import * as elements from './Elements'
 import { createAlert } from '../actions/AlertPortal'
-import { loginSuccess } from '../actions/User'
+import { login } from '../actions/User'
 
 
 class Home extends Component {
@@ -63,7 +63,7 @@ class Home extends Component {
 
   handleLogin = () => {
     const { username, password } = this.state
-    const { createAlert, loginSuccess } = this.props
+    const { createAlert, login } = this.props
     const title = 'Login'
 
     if (!username || !password) {
@@ -71,7 +71,7 @@ class Home extends Component {
     } else {
       axios.post(`api/user/${username}/login`, {password})
       .then(res => {
-        loginSuccess(res.data.token)
+        login(res.data.token)
         this.props.history.push('/game')
       })
       .catch(this.handleError)
@@ -101,7 +101,7 @@ class Home extends Component {
 
   handleSignup = async () => {
     const { username, password } = this.state
-    const { createAlert, loginSuccess } = this.props
+    const { createAlert, login } = this.props
     const title = 'Sign-up'
 
     if (!username || !password) {
@@ -111,7 +111,7 @@ class Home extends Component {
         // Login after sign-up
         await axios.post('api/user/' + username, { password })
         const res = await axios.post(`api/user/${username}/login`, { password })
-        loginSuccess(res.data.token)
+        login(res.data.token)
         createAlert({ title, message: `Successfully registerd.\nWelcome ${username} !`})
         this.props.history.push('/game')
       } catch (err) {
@@ -224,4 +224,4 @@ class Home extends Component {
   }
 }
 
-export default connect(null, { createAlert, loginSuccess })(Home)
+export default connect(null, { createAlert, login })(Home)

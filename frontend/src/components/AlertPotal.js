@@ -5,14 +5,14 @@ import '../scss/AlertPortal.scss'
 import { closeAlert } from '../actions/AlertPortal'
 
 const AlertBox = ({ title, message, onClick }) => {
-  const handleEnter = (e) => {
-    e.key === 'Enter' && onClick()
-  }
-  
+
   useEffect(() => {
+    const handleEnter = (e) => {
+      e.key === 'Enter' && onClick()
+    }
     window.addEventListener('keydown', handleEnter)
     return () => window.removeEventListener('keydown', handleEnter)
-  }, [])
+  }, [onClick])
 
   return (
     <div className="AlertPortal">
