@@ -1,43 +1,29 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { connect } from 'react-redux'
 
-import { BACKEND_WS, AVATAR_WIDTH, AVATAR_HEIGHT } from '../config/constants'
+import { BACKEND_WS, OBJECT_WIDTH, OBJECT_HEIGHT } from '../config/constants'
 import Avatar from './Avatar'
 
 function World(props) {
-  // TODO: Token authrization from server, fail:redirect, success:game
-  // TODO: Connect websocket to Game server and add avatar, World
-  
-  // const testToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiNjEiLCJ1c2VybmFtZSI6ImMxMjMiLCJleHAiOjE1OTAzMDAyNDIsIm9yaWdfaWF0IjoxNTkwMjEzODQyLCJpc3MiOiJkb29sMmx5In0.cHv8bDaE0228BMHGxw8agsDprpT4XwZyBElLB8UhXQw'
+  // const testToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiNzAiLCJ1c2VybmFtZSI6ImRvb2wybHkxMjM0IiwiZXhwIjoxNTkwMzkxMDYyLCJvcmlnX2lhdCI6MTU5MDMwNDY2MiwiaXNzIjoiZG9vbDJseSJ9.jxRif1ljplH-mXVgr5cpv4e-UpBuQgmkh8nbqhIAkgk'
   const testToken = props.token
 
   const webSocket = useRef(null)
-  // ex) [{'avatar':'avatarName', 'location': [x,y]}, ...]
+  // ex) [{'name':'avatarName', 'location': [x,y]}, ...]
   const [avatars, setAvatars] = useState([])
 
   // ComponentDidMount
   useEffect(() => {
     if (testToken) {
-
-      // Set event handler for control avatar
-      window.addEventListener('keydown', (event) =>{
-        const validKey = [37, 38, 39, 40] // Left, Up, Right, Down arrows
-        const key = event.keyCode
-        if (validKey.indexOf(key) !== -1) {
-          event.preventDefault()
-          handleCommand(key)
-        }
-      })
-
       // Websocket connection attempt
       webSocket.current = new WebSocket(BACKEND_WS + 'ws/game', testToken)
 
       webSocket.current.onmessage = (e) => {
         const jsonData = JSON.parse(e.data)
 
-        switch (jsonData['action']) {
-          case 'set_avatar':
-            handleAction(jsonData['data'])
+        switch (jsonData['target']) {
+          case 'avatar':
+            handleAvatar(jsonData['data'])
             break
           default:
             return
@@ -49,6 +35,8 @@ function World(props) {
         console.log('disconnected game server')
         // TODO: redirect to Home, alert error message
       }
+
+      props.gameCommandRef.current = handleGameCommand
   
       return () => webSocket.current.close() 
     } else {
@@ -56,15 +44,28 @@ function World(props) {
     }
   }, [])
 
-  const handleAction = (data) => {
-    // Convert server base position to client base position
-    data['location'][0] *= AVATAR_WIDTH
-    data['location'][1] *= AVATAR_HEIGHT
+  const handleAvatar = (data) => { 
+    //Convert server base position to client base position
+    data['location'][0] *= OBJECT_WIDTH
+    data['location'][1] *= OBJECT_HEIGHT
 
-    setAvatars(prv => prv.filter(info => info.avatar !== data['avatar']).concat(data))
+    switch (data['state']) {
+      case 'set':
+        setAvatars(prv => (
+          prv.filter(info => info.name !== data['name'])
+          .concat({ name: data['name'], location: data['location'] })
+        ))
+        break
+
+      case 'unset':
+        setAvatars(prv => (
+          prv.filter(info => info.name !== data['name'])
+        ))
+        break
+    }
   }
 
-  function handleCommand(key) {
+  function handleGameCommand(key) {
     if (webSocket.current != null) {
       let command = 'move'
       let direction = ''
@@ -87,19 +88,11 @@ function World(props) {
     }
   }
 
-  function testBtn() {
-    const command = 'test'
-    const data = '1'
-    webSocket.current.send(JSON.stringify({ command, data }))
-  }
-
   return (
     <div className='world'>
       {avatars && avatars.map((avatar, i) => (
-        <Avatar key={i} pos={avatar['location']} name={avatar['avatar']} />
+        <Avatar key={i} pos={avatar['location']} name={avatar['name']} />
       ))}
-      {/* <Avatar pos={[100,100]} name='tester' /> */}
-      {/* <button onClick={testBtn} style={{position: 'relative', top: 100}}>test</button> */}
     </div>
   )
 }

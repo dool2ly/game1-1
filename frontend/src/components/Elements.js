@@ -19,6 +19,12 @@ export const Forms = (key, dataList) => {
         placeholder={data.placeholder}
         onChange={data.onChange}
         type={data.type}
+        onKeyDown={(e) => {
+          if (e.key==='Enter') {
+            e.target.blur()
+            data.onEnter()
+          }
+        }}
       />
       {data.text && ButtonInMenu(key + data.text, data.text, data.onSubmit)}
     </div>

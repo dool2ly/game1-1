@@ -12,6 +12,7 @@ class Home extends Component {
   constructor(props) {
     super(props)
     this.state = {
+      isHome: false,
       username: '',
       password: '',
       menuWidth: 0,
@@ -121,6 +122,7 @@ class Home extends Component {
 
   setHomeState = () => {
     this.setState({
+      isHome: true,
       username: '',
       password: '',
       menuWidth: 400,
@@ -134,6 +136,7 @@ class Home extends Component {
 
   setSignupState = () => {
     this.setState({
+      isHome: false,
       menuWidth: 400,
       menuHeight: 450,
       contents: [
@@ -147,7 +150,8 @@ class Home extends Component {
               placeholder:'ID',
               text: 'Check',
               onSubmit: this.handleCheck,
-              type: 'text'
+              type: 'text',
+              onEnter: this.handleSignup
             },
             {
               name: 'password',
@@ -155,7 +159,8 @@ class Home extends Component {
               placeholder:'PASSWORD',
               text: 'Sign-up',
               onSubmit: this.handleSignup,
-              type: 'password'
+              type: 'password',
+              onEnter: this.handleSignup
             }
           ]
         ),
@@ -167,6 +172,7 @@ class Home extends Component {
 
   setLoginState = () => {
     this.setState({
+      isHome: false,
       menuWidth: 400,
       menuHeight: 450,
       contents: [
@@ -180,13 +186,15 @@ class Home extends Component {
               placeholder:'ID',
               text: 'Login',
               onSubmit: this.handleLogin,
-              type: 'text'
+              type: 'text',
+              onEnter: this.handleLogin
             },
             {
               name: 'password',
               onChange: this.inputChange,
               placeholder:'PASSWORD',
-              type: 'password'
+              type: 'password',
+              onEnter: this.handleLogin
             }
           ]
         ),
@@ -197,10 +205,11 @@ class Home extends Component {
   }
 
   render() {
-    const { menuWidth, menuHeight, contents } = this.state
+    const { menuWidth, menuHeight, contents, isHome } = this.state
 
     return (
       <div className='home'>
+        { isHome && <div className='game-title'>Baram Online</div> }
         <div className='menu'
           style={{
             width: `${menuWidth}px`,

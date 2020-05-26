@@ -52,7 +52,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         
 
     async def new_message(self, event):
-        # Send message to consumer from group
+        # Send message to channel from group
         send_data = {'message': event['message'], 'from': event['from']}
 
         await self.send_json(send_data)
@@ -85,25 +85,25 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
 
         # Send avatar initial location
         for i in  Avatar.objects.filter(active=True):
-            await self.send_avatar_to_group(i.name, i.location)
+            await self.send_avatar_to_group('set', i.name, i.location)
 
     async def disconnect(self, close_code):
         self.avatar_queryset.active = False
         self.avatar_queryset.save()
-        pass
+        await self.send_avatar_to_group('unset')
 
     async def receive_json(self, text_data):
         '''
-        Receive the command from consumer
+        Receive the command from channel
         '''
         try:
             await self.command_handler(text_data['command'], text_data['data'])
         except KeyError:
             pass
 
-    async def send_avatar_to_group(self, name=None, location=None):
+    async def send_avatar_to_group(self, state, name=None, location=None):
         '''
-        Send avatar location to group 
+        Send avatar information to group 
         '''
         if not name:
             name = self.avatar_name
@@ -111,26 +111,40 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             location = self.avatar_queryset.location
 
         group_event = {
-            'type': 'send_avatar',
-            'avatar': name,
-            'location': location
+            'type': 'dispatch_channel',
+            'target': 'avatar',
+            'data': {
+                'state': state,
+                'name': name,
+                'location': location
+            }
         }
 
         await self.channel_layer.group_send(self.group_name, group_event)
 
-    async def send_avatar(self, event):
+    async def dispatch_channel(self, event):
         '''
-        Send avatar, location received from group to consumer
+        Send data received from group to channel
         '''
-        data = {
-            'action': 'set_avatar',
-            'data': {
-                'avatar': event['avatar'],
-                'location': event['location']
-            }
+        payload = {
+            'target': event['target'],
+            'data': event['data']
         }
 
-        await self.send_json(data)
+        await self.send_json(payload)
+    # async def send_avatar(self, event):
+    #     '''
+    #     Send avatar, location received from group to channel
+    #     '''
+    #     data = {
+    #         'target': 'avatar',
+    #         'data': {
+    #             'state': event['state']
+    #             'name': event['avatar'],
+    #             'location': event['location']
+    #         }
+    #     }
+    #     await self.send_json(data)
         
     async def command_handler(self, command, data):
         if command == 'move':
@@ -139,20 +153,9 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             if self.is_possible_location(new_location):
                 self.avatar_queryset.location = new_location
                 self.avatar_queryset.save()
-                await self.send_avatar_to_group()
+                await self.send_avatar_to_group('set')
             else:
                 return
-        
-        elif command == 'test':
-            print("ho")
-            self.test_2()
-    
-    def test_2(self):
-        pass
-        
-
-
-
     
     def get_new_location(self, direction):
         new_location = copy.deepcopy(self.avatar_queryset.location)

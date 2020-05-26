@@ -11,8 +11,6 @@ function Chat(props) {
   const [message, setMessage] = useState('')
   const [messages, setMessages] = useState([])
 
-  
-  
 
   // ComponentDidMount
   useEffect(() => {
@@ -66,8 +64,12 @@ function Chat(props) {
   }
 
   const handleKeydown = (e) => {
-    if (e.key==='Enter') {
+    e.stopPropagation() // Prevent key handling of Game component
+    if (e.key === 'Enter') {
+      
+      e.target.blur()
       handleOnSubmit()
+      
     }
   }
 
@@ -109,6 +111,7 @@ function Chat(props) {
             onKeyDown={handleKeydown}
             value={message}
             required
+            ref={props.chatInputRef}
           />
           <div className='submit' onClick={handleOnSubmit}>
             Send

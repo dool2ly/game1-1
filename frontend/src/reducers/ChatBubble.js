@@ -8,9 +8,8 @@ const initialState = [
     switch(action.type) {
       case CREATE_CHAT:
         return prev.filter(item => {
-            if (action.payload.chat.from == item.chat.from) {
+            if (action.payload.chat.from === item.chat.from) {
                 clearTimeout(item.timer)
-                console.log('timer claer:', item.chat.message)
                 return false
             }
             return true

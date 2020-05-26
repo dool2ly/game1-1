@@ -1,16 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 
-import { AVATAR_WIDTH, AVATAR_HEIGHT } from '../config/constants'
+import { OBJECT_WIDTH, OBJECT_HEIGHT } from '../config/constants'
 import walkAvatar from '../img/Avatar.png'
 
 
 function ChatBubble(props) {
-  console.log("inBubble",props)
   return (
-    
     <div className='chat-bubble'>
-      {console.log('render!!')}
       <span>
         {props.chat.from}:&nbsp;
       </span>
@@ -32,12 +29,12 @@ function Avatar(props) {
         top: posY,
         left: posX,
         backgroundImage: `url('${walkAvatar}')`,
-        width: AVATAR_WIDTH + 'px',
-        height: AVATAR_HEIGHT + 'px'
+        width: OBJECT_WIDTH + 'px',
+        height: OBJECT_HEIGHT + 'px'
       }}
     >
       { myChats.length !== 0 && <ChatBubble chat={myChats[0].chat} />}
-      <div className='name-plate'>{props.name}</div>
+      <div className='name-plate'><div>{props.name}</div></div>
     </div>
   )
 }
