@@ -2,9 +2,10 @@ import json
 import copy
 
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
+from django.core.exceptions import ObjectDoesNotExist
+
 from .serializers import AvatarSerializer
 from .models import Avatar
-
 
 
 class ChatConsumer(AsyncJsonWebsocketConsumer):
@@ -64,15 +65,16 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
 
         try:
             user = self.scope['validated']['user']
-            self.avatar_queryset = user.avatar_set.get()
             self.username = str(user)
+            
+            self.avatar_queryset = user.avatar_set.get()
             self.avatar_name = str(self.avatar_queryset)
 
-        except KeyError:
+        except (KeyError, ObjectDoesNotExist):
             # connection deny
-            self.close()
+            await self.close()
             return
-
+        
         # join group
         self.group_name = 'game_main'
         await self.channel_layer.group_add(self.group_name, self.channel_name)
@@ -81,16 +83,20 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
         self.is_connect = True
         self.avatar_queryset.active = True
         self.avatar_queryset.save()
-        await self.accept(self.scope['validated']['token'])
+        await self.accept(subprotocol=self.scope['validated']['token'])
+
+        await self.send_user_statistics()
 
         # Send avatar initial location
         for i in  Avatar.objects.filter(active=True):
             await self.send_avatar_to_group('set', i.name, i.location)
+        
 
     async def disconnect(self, close_code):
-        self.avatar_queryset.active = False
-        self.avatar_queryset.save()
-        await self.send_avatar_to_group('unset')
+        if self.is_connect:
+            self.avatar_queryset.active = False
+            self.avatar_queryset.save()
+            await self.send_avatar_to_group('unset')
 
     async def receive_json(self, text_data):
         '''
@@ -100,6 +106,20 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             await self.command_handler(text_data['command'], text_data['data'])
         except KeyError:
             pass
+
+    async def send_user_statistics(self):
+        group_event = {
+            'type': 'dispatch_channel',
+            'target': 'stats',
+            'data': {
+                'level': self.avatar_queryset.level,
+                'health': self.avatar_queryset.health,
+                'mana': self.avatar_queryset.mana,
+                'money': self.avatar_queryset.money
+            }
+        }
+
+        await self.channel_layer.group_send(self.group_name, group_event)
 
     async def send_avatar_to_group(self, state, name=None, location=None):
         '''

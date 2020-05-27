@@ -9,6 +9,10 @@ class Avatar(models.Model):
     current_map = models.IntegerField(default=0)
     location = ArrayField(models.IntegerField(default=0), size=2)
     active = models.BooleanField(default=False)
+    level = models.IntegerField(default=1)
+    health = models.IntegerField(default=100)
+    mana = models.IntegerField(default=100)
+    money = models.IntegerField(default=0)
 
     def __str__(self):
         return self.name

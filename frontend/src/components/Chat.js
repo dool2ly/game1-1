@@ -112,7 +112,7 @@ function Chat(props) {
             onKeyDown={handleKeydown}
             value={message}
             required
-            ref={props.chatInputRef}
+            ref={props.handleChat}
           />
           <div className='submit' onClick={handleOnSubmit}>
             Send
