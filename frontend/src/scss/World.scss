@@ -1,0 +1,52 @@
+@import "constants.scss";
+
+.world {
+    position: relative;
+    width: $worldWidth;
+    height: $worldHeight;
+    background-color: #c77a35;
+
+
+    .avatar .name-plate {
+      position: relative;
+      top: 100%;
+      display: flex;
+      justify-content: center;
+
+      div {
+        background: #d1ab89;
+        padding-left: 3px;
+        padding-right: 3px;
+        border-radius: 5px;
+        font-size: 0.8rem;
+      }
+    }
+
+    .avatar .chat-bubble {
+      padding: 3px;
+      max-width: 120px;
+      word-wrap: break-word;
+      position: absolute;
+      background-color: #eee;
+      bottom: 77px;
+      left: -15%;
+      font-size: 0.8rem;
+      
+      span {
+        font-weight: 600;
+      }
+    }
+    .avatar .chat-bubble:after {
+      position: absolute;
+      display: block;
+      content: "";  
+      border-color: #eee transparent transparent transparent;
+      border-style: solid;
+      border-width: 10px;
+      height: 0;
+      width: 0;
+      position: absolute;
+      bottom: -19px;
+      left: 16px;
+    }
+  }

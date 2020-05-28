@@ -11,7 +11,9 @@ class Avatar(models.Model):
     active = models.BooleanField(default=False)
     level = models.IntegerField(default=1)
     health = models.IntegerField(default=100)
+    max_health = models.IntegerField(default=100)
     mana = models.IntegerField(default=100)
+    max_mana = models.IntegerField(default=100)
     money = models.IntegerField(default=0)
 
     def __str__(self):

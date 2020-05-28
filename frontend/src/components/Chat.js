@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { connect } from 'react-redux'
 
+import '../scss/Chat.scss'
 import { BACKEND_WS } from '../config/constants'
 import { createChat, closeChat } from '../actions/ChatBubble'
 
@@ -11,7 +12,6 @@ function Chat(props) {
   const [message, setMessage] = useState('')
   const [messages, setMessages] = useState([])
   const { token, createChat, closeChat } = props
-
 
   // ComponentDidMount
   useEffect(() => {
@@ -112,7 +112,7 @@ function Chat(props) {
             onKeyDown={handleKeydown}
             value={message}
             required
-            ref={props.handleChat}
+            ref={props.handleChatRef}
           />
           <div className='submit' onClick={handleOnSubmit}>
             Send

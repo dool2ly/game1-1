@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { Redirect } from 'react-router-dom'
 
-import '../scss/Game.scss'
 import Chat from './Chat'
 import World from './World'
 import GameInfo from './GameInfo'
@@ -12,8 +11,8 @@ function Game(props) {
   const { token } = props
   const webSocket = useRef(null)
   const handleChat = useRef(null)
-  const handleWorld = useRef(null)
-  const handleGameInfo = useRef(null)
+  const handleAvatars = useRef(null)
+  const handleStats = useRef(null)
   const [toHome, setToHome] = useState(false)
   const moveCommands = [37, 38, 39, 40]
   const moveCommandsToServer = ['left', 'up', 'right', 'down']
@@ -29,7 +28,7 @@ function Game(props) {
         let idx = moveCommands.indexOf(e.keyCode)
         if (idx !== -1){
           e.preventDefault()
-          UserCmdToServer('move', moveCommandsToServer[idx])
+          UserCmdToServer('move', { direction: moveCommandsToServer[idx] })
         }
       }
     }
@@ -53,7 +52,10 @@ function Game(props) {
 
         switch (jsonData['target']) {
           case 'avatar':
-            handleWorld.current(jsonData['data'])
+            handleAvatars.current(jsonData['data'])
+            break
+          case 'stats':
+            handleStats.current(jsonData['data'])
             break
           default:
             return
@@ -71,9 +73,9 @@ function Game(props) {
     }
   }, [token, moveCommands, moveCommandsToServer])
 
-  const UserCmdToServer = (command, direction) => {
+  const UserCmdToServer = (command, data) => {
     if (webSocket.current != null) {
-      webSocket.current.send(JSON.stringify({ command, data: { direction } }))
+      webSocket.current.send(JSON.stringify({ command, data }))
     }
   }
 
@@ -81,10 +83,10 @@ function Game(props) {
     <div className='game'>
       {toHome && <Redirect to='/' />}
       <div>
-        <World worldRef={handleWorld} />
-        <Chat chatRef={handleChat} />
+        <World handleAvatarsRef={handleAvatars} />
+        <Chat handleChatRef={handleChat} />
       </div>
-      <GameInfo gameInfoRef={handleGameInfo} />
+      <GameInfo handleStatsRef={handleStats} />
     </div>
   )
 }

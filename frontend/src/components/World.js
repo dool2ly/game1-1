@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react'
 
+import '../scss/World.scss'
 import { OBJECT_WIDTH, OBJECT_HEIGHT } from '../config/constants'
 import Avatar from './Avatar'
 
+
 function World(props) {
-  const { worldRef } = props
+  const { handleAvatarsRef } = props
   const [avatars, setAvatars] = useState([])// ex) [{'name':'avatarName', 'location': [x,y]}, ...]
 
   useEffect(() => {
-    worldRef.current = handleData
-  }, [worldRef])
+    handleAvatarsRef.current = handleAvatars
+  }, [handleAvatarsRef])
 
-  const handleData = (data) => { 
+  const handleAvatars = (data) => {
     //Convert server base position to client base position
     data['location'][0] *= OBJECT_WIDTH
     data['location'][1] *= OBJECT_HEIGHT
@@ -33,29 +35,6 @@ function World(props) {
         return
     }
   }
-
-  // function handleGameCommand(key) {
-  //   if (webSocket.current != null) {
-  //     let command = 'move'
-  //     let direction = ''
-  //     switch (key) {
-  //       case 37:
-  //         direction = 'left'
-  //         break
-  //       case 38:
-  //         direction = 'up'
-  //         break
-  //       case 39:
-  //         direction = 'right'
-  //         break
-  //       case 40:
-  //         direction = 'down'
-  //         break
-  //       default: return
-  //     }
-  //     webSocket.current.send(JSON.stringify({ command, data: { direction } }))
-  //   }
-  // }
 
   return (
     <div className='world'>

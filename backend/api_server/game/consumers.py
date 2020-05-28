@@ -68,7 +68,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             self.username = str(user)
             
             self.avatar_queryset = user.avatar_set.get()
-            self.avatar_name = str(self.avatar_queryset)
+            self.avatar_serializer = AvatarSerializer(instance=self.avatar_queryset)
 
         except (KeyError, ObjectDoesNotExist):
             # connection deny
@@ -89,14 +89,14 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
 
         # Send avatar initial location
         for i in  Avatar.objects.filter(active=True):
-            await self.send_avatar_to_group('set', i.name, i.location)
+            await self.send_avatar('set', i.name, i.location)
         
 
     async def disconnect(self, close_code):
         if self.is_connect:
             self.avatar_queryset.active = False
             self.avatar_queryset.save()
-            await self.send_avatar_to_group('unset')
+            await self.send_avatar('unset')
 
     async def receive_json(self, text_data):
         '''
@@ -111,22 +111,17 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
         group_event = {
             'type': 'dispatch_channel',
             'target': 'stats',
-            'data': {
-                'level': self.avatar_queryset.level,
-                'health': self.avatar_queryset.health,
-                'mana': self.avatar_queryset.mana,
-                'money': self.avatar_queryset.money
-            }
+            'data': self.avatar_serializer.data
         }
 
         await self.channel_layer.group_send(self.group_name, group_event)
 
-    async def send_avatar_to_group(self, state, name=None, location=None):
+    async def send_avatar(self, state, name=None, location=None):
         '''
         Send avatar information to group 
         '''
         if not name:
-            name = self.avatar_name
+            name = self.avatar_serializer.data['name']
         if not location:
             location = self.avatar_queryset.location
 
@@ -152,19 +147,6 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
         }
 
         await self.send_json(payload)
-    # async def send_avatar(self, event):
-    #     '''
-    #     Send avatar, location received from group to channel
-    #     '''
-    #     data = {
-    #         'target': 'avatar',
-    #         'data': {
-    #             'state': event['state']
-    #             'name': event['avatar'],
-    #             'location': event['location']
-    #         }
-    #     }
-    #     await self.send_json(data)
         
     async def command_handler(self, command, data):
         if command == 'move':
@@ -173,7 +155,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             if self.is_possible_location(new_location):
                 self.avatar_queryset.location = new_location
                 self.avatar_queryset.save()
-                await self.send_avatar_to_group('set')
+                await self.send_avatar('set')
             else:
                 return
     

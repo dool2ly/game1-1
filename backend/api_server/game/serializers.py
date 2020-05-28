@@ -5,4 +5,4 @@ from .models import Avatar
 class AvatarSerializer(serializers.ModelSerializer):
     class Meta:
         model = Avatar
-        fields = ('name', 'current_map', 'location')
+        fields = ('name', 'level', 'health', 'max_health', 'mana', 'max_mana', 'money')
