@@ -155,7 +155,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             if self.is_possible_location(new_location):
                 self.avatar_queryset.location = new_location
                 self.avatar_queryset.save()
-                await self.send_avatar('set')
+                await self.send_avatar('move')
             else:
                 return
     

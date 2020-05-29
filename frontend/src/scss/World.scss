@@ -6,10 +6,14 @@
     height: $worldHeight;
     background-color: #c77a35;
 
+    .avatar {
+      position: absolute;
+      width: $objectWidth;
+      height: $objectHeight;
+      transition: left .5s ease-in-out 0s, top .5s ease-in-out 0s;
+    }
 
     .avatar .name-plate {
-      position: relative;
-      top: 100%;
       display: flex;
       justify-content: center;
 

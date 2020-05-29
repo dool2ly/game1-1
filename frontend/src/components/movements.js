@@ -1,4 +1,4 @@
 
-export default function handleMovement(player){
+export default function movementAvatar(player){
     return player
 }

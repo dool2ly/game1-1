@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react'
+import { connect } from 'react-redux'
 
 import '../scss/World.scss'
 import { OBJECT_WIDTH, OBJECT_HEIGHT } from '../config/constants'
 import Avatar from './Avatar'
+import { setAvatar, moveAvatar } from '../actions/Avatars'
+
+import walkAvatar from '../img/Avatar.png'
 
 
 function World(props) {
   const { handleAvatarsRef } = props
-  const [avatars, setAvatars] = useState([])// ex) [{'name':'avatarName', 'location': [x,y]}, ...]
-
+  const { setAvatar, moveAvatar } = props
+  
   useEffect(() => {
     handleAvatarsRef.current = handleAvatars
   }, [handleAvatarsRef])
@@ -19,30 +23,42 @@ function World(props) {
     data['location'][1] *= OBJECT_HEIGHT
 
     switch (data['state']) {
+      case 'move':
+        moveAvatar(data['name'], data['location'])
+        break
       case 'set':
-        setAvatars(prv => (
-          prv.filter(info => info.name !== data['name'])
-          .concat({ name: data['name'], location: data['location'] })
-        ))
+        setAvatar(data['name'], data['location'])
         break
 
       case 'unset':
-        setAvatars(prv => (
-          prv.filter(info => info.name !== data['name'])
-        ))
+        // setAvatars(prv => (
+        //   prv.filter(info => info.name !== data['name'])
+        // ))
         break
       default:
         return
     }
   }
+  const test11 = () => {
+    console.log(props.avatars)
+  }
 
   return (
     <div className='world'>
-      {avatars && avatars.map((avatar, i) => (
-        <Avatar key={i} pos={avatar['location']} name={avatar['name']} />
+      {props.avatars && props.avatars.map((avatar, i) => (
+        <Avatar
+          key={i}
+          name={avatar['name']}
+          pos={avatar['location']}
+          canvasRef={avatar['canvasRef']}
+        />
       ))}
+      <button onClick={test11}>test</button>
     </div>
   )
 }
 
-export default World
+export default connect(
+  ({ avatars }) => ({ avatars }),
+  { setAvatar, moveAvatar }
+)(World)

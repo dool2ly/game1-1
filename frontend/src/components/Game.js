@@ -19,9 +19,10 @@ function Game(props) {
   
   // ComponentDidMount
   useEffect(() => {
+    
+    // User input handler
     const handleKeyDown = (e) => {
-      // User input handler
-  
+      
       if (e.key === 'Enter') {
         handleChat.current.focus()
       } else {
@@ -48,7 +49,7 @@ function Game(props) {
 
       webSocket.current.onmessage = (e) => {
         const jsonData = JSON.parse(e.data)
-        console.log(e.data)
+        console.log("RECIEVE FROM SERVER", e.data)
 
         switch (jsonData['target']) {
           case 'avatar':

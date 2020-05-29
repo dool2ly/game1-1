@@ -15,3 +15,9 @@ export const BACKEND_WS = 'ws://49.247.192.202:82/'
 export const OBJECT_WIDTH = 40
 
 export const OBJECT_HEIGHT = 60
+
+export const SET_AVATAR = 'SET_AVATAR'
+
+export const UNSET_AVATAR = 'UNSET_AVATAR'
+
+export const MOVE_AVATAR = 'MOVE_AVATAR'

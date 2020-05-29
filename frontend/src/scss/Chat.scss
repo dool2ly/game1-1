@@ -6,11 +6,11 @@
     
     .text-area {
       flex: 1;
-      
       background-color: #DEB887;
       border-top: 5px solid #452000;
       border-bottom: 2px solid #452000;
       overflow:auto;
+      z-index:2;
 
       ul {
         margin: 0;
@@ -48,18 +48,6 @@
         background-color: #cc9a69;
         color: #452000;
       }
-
-      .test-submit {
-        font-size: 1.1rem;
-        background-color: #452000;
-        color:#cc9a69;
-        font-weight: 600;
-        padding-left: 15px;
-        padding-right: 15px;
-        cursor:pointer;
-        user-select: none;
-      }
-      
     }
   }
   
