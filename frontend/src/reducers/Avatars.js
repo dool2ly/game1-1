@@ -1,4 +1,3 @@
-import React from 'react'
 import { SET_AVATAR, UNSET_AVATAR, MOVE_AVATAR } from '../config/constants'
 
 const initialState = []
@@ -6,17 +5,28 @@ const initialState = []
 
 const avatarsReducer = (state = initialState, action) => {
     const prev = [...state]
+
     switch(action.type) {
         case SET_AVATAR:
-            const canvasRef = React.createRef()
-            action.payload.canvasRef = canvasRef
-            return prev.filter(item => item.name !== action.payload.name).concat(action.payload)
+            return prev.filter(
+                item => item.name !== action.payload.name
+            ).concat(action.payload)
+
         case MOVE_AVATAR:
             return prev.map(
                 item => item.name === action.payload.name
-                ? { ...item, ...action.payload}
+                ? { ...item, ...action.payload }
                 : item
             )
+
+        case UNSET_AVATAR:
+            return prev.map(
+                item => item.name === action.payload.name
+                ? { ...item, name: null }
+                : item
+            )
+            // return prev.filter(item => item.name !== action.payload.name)
+
         default:
             return state
     }

@@ -24,13 +24,15 @@ function Avatar(props) {
   const prevPosY = useRef()
   const posX = props.pos[0]
   const posY = props.pos[1]
+  // const canvasRef = useRef()
+  const canvasRef = React.createRef();
   const [avatarImg, setAvatarImg] = useState(new Image())
   const directionMap = { SOUTH: 0, WEST: 1, EAST: 2, NORTH: 3 }
   const myChats = props.chats.filter(item => item.chat.from === props.name)
 
   const avatar = (action, dir = 0) => {
-    if (props.canvasRef && props.canvasRef.current) {
-      const ctx = props.canvasRef.current.getContext('2d')
+    if (canvasRef && canvasRef.current) {
+      const ctx = canvasRef.current.getContext('2d')
 
       const draw = frame => {
         ctx.clearRect(0, 0, OBJECT_WIDTH, OBJECT_HEIGHT)
@@ -54,7 +56,7 @@ function Avatar(props) {
           currentFrame += 1;
         }
       }
-      
+
       const main = () => {
         draw(currentFrame)
         update()
@@ -78,6 +80,10 @@ function Avatar(props) {
     avatarImg.onload = () => {
       avatar('draw', 0)
     }
+
+    return () => {
+      console.log('unmount!!')
+    }
   }, [])
 
   useEffect(() => {
@@ -85,9 +91,6 @@ function Avatar(props) {
     prevPosY.current = posY
   }, [posX,posY])
   
-
-  console.log(props.name, prevPosX.current, prevPosY.current)
-  console.log(props.name, posX, posY)
   if (posX - prevPosX.current < 0) {
     avatar('animate', directionMap['WEST'])
   }
@@ -103,8 +106,8 @@ function Avatar(props) {
 
   return (
     <div className='avatar' style={{ top: posY, left: posX }}>
-      { myChats.length !== 0 && <ChatBubble chat={myChats[0].chat} />}
-      <canvas ref={props.canvasRef} width={OBJECT_WIDTH} height={OBJECT_HEIGHT} />
+      { myChats.length !== 0 && <ChatBubble chat={myChats[0].chat} /> }
+      <canvas ref={canvasRef} width={OBJECT_WIDTH} height={OBJECT_HEIGHT} />
       <div className='name-plate'><div>{props.name}</div></div>
     </div>
   )

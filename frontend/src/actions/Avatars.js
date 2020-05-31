@@ -5,8 +5,7 @@ export const setAvatar = (name, location) => {
         type: SET_AVATAR,
         payload: {
             name,
-            location,
-            canvasRef: null
+            location
         }
     }
 }
@@ -17,6 +16,15 @@ export const moveAvatar = (name, location) => {
         payload: {
             name,
             location
+        }
+    }
+}
+
+export const unsetAvatar = (name) => {
+    return {
+        type: UNSET_AVATAR,
+        payload: {
+            name,
         }
     }
 }
