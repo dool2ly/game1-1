@@ -1,4 +1,8 @@
-import { SET_AVATAR, UNSET_AVATAR, MOVE_AVATAR } from '../config/constants'
+import {
+    SET_AVATAR,
+    UNSET_AVATAR,
+    MOVE_AVATAR,
+    RESET_AVATAR } from '../config/constants'
 
 const initialState = []
 //ex [{ name: 'avatarName', location: [x,y]}]
@@ -8,10 +12,22 @@ const avatarsReducer = (state = initialState, action) => {
 
     switch(action.type) {
         case SET_AVATAR:
-            return prev.filter(
-                item => item.name !== action.payload.name
-            ).concat(action.payload)
+            let addFlag = true
+            const ret = prev.map(item => {
+                if (item.name === action.payload.name) {
+                    addFlag = false
+                    return { ...action.payload }
+                } else {
+                    return item
+                }
+            })
 
+            if (addFlag) {
+                return ret.concat(action.payload)
+            }
+            
+            return ret
+            
         case MOVE_AVATAR:
             return prev.map(
                 item => item.name === action.payload.name
@@ -22,10 +38,12 @@ const avatarsReducer = (state = initialState, action) => {
         case UNSET_AVATAR:
             return prev.map(
                 item => item.name === action.payload.name
-                ? { ...item, name: null }
+                ? { ...item, active: false }
                 : item
             )
-            // return prev.filter(item => item.name !== action.payload.name)
+        
+        case RESET_AVATAR:
+            return initialState
 
         default:
             return state

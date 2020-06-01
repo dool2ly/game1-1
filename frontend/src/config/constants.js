@@ -21,3 +21,5 @@ export const SET_AVATAR = 'SET_AVATAR'
 export const UNSET_AVATAR = 'UNSET_AVATAR'
 
 export const MOVE_AVATAR = 'MOVE_AVATAR'
+
+export const RESET_AVATAR = 'RESET_AVATAR'

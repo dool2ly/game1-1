@@ -2,10 +2,14 @@ import React, { useState, useEffect, useRef } from 'react'
 import { connect } from 'react-redux'
 
 import '../scss/Chat.scss'
+import { useIsMountedRef } from './utils'
 import { BACKEND_WS } from '../config/constants'
 import { createChat, closeChat } from '../actions/ChatBubble'
 
+
 function Chat(props) {
+  // let isMount = false
+  const isMountedRef = useIsMountedRef()
   const maxLength = 20
   const webSocket = useRef(null)
   const messageEnd = useRef(null)
@@ -15,6 +19,8 @@ function Chat(props) {
 
   // ComponentDidMount
   useEffect(() => {
+    // isMount = true
+
     if (token) {
       // Websocket connection attempt
       webSocket.current = new WebSocket(BACKEND_WS + 'ws/chat/1', token)
@@ -29,12 +35,10 @@ function Chat(props) {
         // Recieve data from backend, update data to messages
         const parsedData = JSON.parse(e.data)
         setMessages(prev => {
-          
           if (prev.length === maxLength) {
             return [...prev.slice(1), parsedData]
           }
           return [...prev, parsedData]
-          
         })
         
         createChat(
@@ -48,17 +52,22 @@ function Chat(props) {
       webSocket.current.onclose = () => {
         // Websocket connection close
         const errorMsg = "Chat server disconnected, please restart."
-        setMessages([{'from':'System Error', 'message': errorMsg}])
+        // if (isMount){
+        if (isMountedRef.current) {
+          setMessages([{'from':'System Error', 'message': errorMsg}])
+        }
       }
   
-      return () => webSocket.current.close()
+      return () => {
+        // isMount = false
+        webSocket.current.close()
+      }
     } else {
       // client does not have token 
       const errorMsg = "Please login"
       setMessages([{'from':'System Error', 'message': errorMsg}])
     }
-
-  }, [token,createChat, closeChat])
+  }, [token, createChat, closeChat, isMountedRef])
 
   const inputChange = (e) => {
     setMessage(e.target.value)

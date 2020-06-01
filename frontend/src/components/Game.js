@@ -5,14 +5,16 @@ import { Redirect } from 'react-router-dom'
 import Chat from './Chat'
 import World from './World'
 import GameInfo from './GameInfo'
+import { useIsMountedRef } from './utils'
 import { BACKEND_WS } from '../config/constants'
 
 function Game(props) {
   const { token } = props
   const webSocket = useRef(null)
   const handleChat = useRef(null)
-  const handleAvatars = useRef(null)
   const handleStats = useRef(null)
+  const handleAvatars = useRef(null)
+  const isMountedRef = useIsMountedRef()
   const [toHome, setToHome] = useState(false)
   const moveCommands = [37, 38, 39, 40]
   const moveCommandsToServer = ['left', 'up', 'right', 'down']
@@ -41,10 +43,11 @@ function Game(props) {
       webSocket.current = new WebSocket(BACKEND_WS + 'ws/game', token)
 
       webSocket.current.onclose = (e) => {
-        console.log(e)
         // Websocket connection close
         console.log('disconnected game server')
-        setToHome(true)
+        if (isMountedRef.current){
+          setToHome(true)
+        }
       }
 
       webSocket.current.onmessage = (e) => {
@@ -70,9 +73,10 @@ function Game(props) {
       }
     } else {
       // if does not have a token, redirect to home
+      // setTimeout(()=> setToHome(true), 3000)
       setToHome(true)
     }
-  }, [token, moveCommands, moveCommandsToServer])
+  }, [token, moveCommands, moveCommandsToServer, isMountedRef])
 
   const UserCmdToServer = (command, data) => {
     if (webSocket.current != null) {

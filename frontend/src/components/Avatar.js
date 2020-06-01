@@ -25,7 +25,7 @@ function Avatar(props) {
   const posX = props.pos[0]
   const posY = props.pos[1]
   // const canvasRef = useRef()
-  const canvasRef = React.createRef();
+  const canvasRef = useRef(null);
   const [avatarImg, setAvatarImg] = useState(new Image())
   const directionMap = { SOUTH: 0, WEST: 1, EAST: 2, NORTH: 3 }
   const myChats = props.chats.filter(item => item.chat.from === props.name)
@@ -79,10 +79,6 @@ function Avatar(props) {
     avatarImg.src = walkAvatar
     avatarImg.onload = () => {
       avatar('draw', 0)
-    }
-
-    return () => {
-      console.log('unmount!!')
     }
   }, [])
 
