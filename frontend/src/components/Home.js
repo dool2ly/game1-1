@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import '../scss/Home.scss'
 import * as elements from './Elements'
 import { createAlert } from '../actions/AlertPortal'
-import { login } from '../actions/User'
+import { login, logout } from '../actions/User'
 
 
 class Home extends Component {
@@ -17,13 +17,17 @@ class Home extends Component {
       password: '',
       menuWidth: 0,
       menuHeight: 0,
-      contents: []
+      contents: [],
+      token: props.user.token
     }
   }
 
-
   componentDidMount() {
-    this.setHomeState()
+    if (this.state.token){
+      this.setLogegdInState()
+    } else {
+      this.setHomeState()
+    }
   }
 
   inputChange = (e) =>{
@@ -120,6 +124,12 @@ class Home extends Component {
     }
   }
 
+  handleLogout = () => {
+    const { logout } = this.props
+    logout()
+    this.setHomeState()
+  }
+
   setHomeState = () => {
     this.setState({
       isHome: true,
@@ -130,6 +140,18 @@ class Home extends Component {
       contents: [
         elements.ButtonInMenu('main01', 'Sign-up', this.setSignupState),
         elements.ButtonInMenu('main02', 'Login', this.setLoginState)
+      ]
+    })
+  }
+
+  setLogegdInState = () => {
+    this.setState({
+      isHome: true,
+      menuWidth: 400,
+      menuHeight: 270,
+      contents: [
+        elements.ButtonInMenu('main01', 'Continue', () => {this.props.history.push('/game')}),
+        elements.ButtonInMenu('main02', 'Logout', this.handleLogout)
       ]
     })
   }
@@ -224,4 +246,6 @@ class Home extends Component {
   }
 }
 
-export default connect(null, { createAlert, login })(Home)
+const mapStateToProps = state => ({ user: state.user })
+
+export default connect(mapStateToProps, { createAlert, login, logout })(Home)
