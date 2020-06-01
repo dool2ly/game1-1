@@ -14,6 +14,7 @@ const userReducer = (state = initialState, action) => {
       return {
         token: null
       }
+
     default:
       return state
   }

@@ -6,7 +6,8 @@ import Chat from './Chat'
 import World from './World'
 import GameInfo from './GameInfo'
 import { useIsMountedRef } from './utils'
-import { BACKEND_WS } from '../config/constants'
+import { BACKEND_WS, ANIMATION_SPEED } from '../config/constants'
+
 
 function Game(props) {
   const { token } = props
@@ -19,19 +20,24 @@ function Game(props) {
   const moveCommands = [37, 38, 39, 40]
   const moveCommandsToServer = ['left', 'up', 'right', 'down']
   
+  
   // ComponentDidMount
   useEffect(() => {
-    
+    let timeStamp = 0
+
     // User input handler
     const handleKeyDown = (e) => {
-      
-      if (e.key === 'Enter') {
-        handleChat.current.focus()
-      } else {
-        let idx = moveCommands.indexOf(e.keyCode)
-        if (idx !== -1){
-          e.preventDefault()
-          UserCmdToServer('move', { direction: moveCommandsToServer[idx] })
+      if (timeStamp + ANIMATION_SPEED < Date.now()) {
+        timeStamp = Date.now()
+
+        if (e.key === 'Enter') {
+          handleChat.current.focus()
+        } else {
+          let idx = moveCommands.indexOf(e.keyCode)
+          if (idx !== -1){
+            e.preventDefault()
+            UserCmdToServer('move', { direction: moveCommandsToServer[idx] })
+          }
         }
       }
     }

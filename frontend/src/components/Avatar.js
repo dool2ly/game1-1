@@ -22,9 +22,7 @@ function Avatar(props) {
   const ticksPerFrame = 5
   const prevPosX = useRef()
   const prevPosY = useRef()
-  const posX = props.pos[0]
-  const posY = props.pos[1]
-  // const canvasRef = useRef()
+  const [posX, posY] = props.pos
   const canvasRef = useRef(null);
   const [avatarImg, setAvatarImg] = useState(new Image())
   const directionMap = { SOUTH: 0, WEST: 1, EAST: 2, NORTH: 3 }
@@ -112,6 +110,7 @@ function Avatar(props) {
 const mapStateToProps = (state) => {
   return {
     chats: [...state.chat]
+
   }
 }
 

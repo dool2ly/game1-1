@@ -1,5 +1,6 @@
 import json
 import copy
+import time
 
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from django.core.exceptions import ObjectDoesNotExist
@@ -7,6 +8,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from .serializers import AvatarSerializer
 from .models import Avatar
 
+CLIENT_ANIMATION_SPEED = 0.350
 
 class ChatConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
@@ -62,6 +64,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 class GameConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
         self.is_connect = False
+        self.time_stamp = 0
 
         try:
             user = self.scope['validated']['user']
@@ -103,7 +106,10 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
         Receive the command from channel
         '''
         try:
-            await self.command_handler(text_data['command'], text_data['data'])
+            # make sure client animation speed
+            if self.time_stamp + CLIENT_ANIMATION_SPEED < time.time():
+                self.time_stamp = time.time()
+                await self.command_handler(text_data['command'], text_data['data'])
         except KeyError:
             pass
 
