@@ -54,7 +54,9 @@ function World(props) {
               pos={avatar['location']}
             />
           )
-        }  
+        } else {
+          return null
+        }
       })}
     </div>
   )

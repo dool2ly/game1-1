@@ -2,11 +2,13 @@ import json
 import copy
 import time
 
-from channels.generic.websocket import AsyncJsonWebsocketConsumer
+from asgiref.sync import async_to_sync
 from django.core.exceptions import ObjectDoesNotExist
+from channels.generic.websocket import AsyncJsonWebsocketConsumer, SyncConsumer
 
-from .serializers import AvatarSerializer
 from .models import Avatar
+from .game_engine import GameEngine
+from .serializers import AvatarSerializer
 
 CLIENT_ANIMATION_SPEED = 0.350
 
@@ -61,7 +63,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         await self.send_json(send_data)
 
 
-class GameConsumer(AsyncJsonWebsocketConsumer):
+class PlayerConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
         self.is_connect = False
         self.time_stamp = 0
@@ -71,35 +73,58 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             self.username = str(user)
             
             self.avatar_queryset = user.avatar_set.get()
-            self.avatar_serializer = AvatarSerializer(instance=self.avatar_queryset)
+            self.avatar_name = self.avatar_queryset.name
+            self.current_map = self.avatar_queryset.current_map
+            self.avatar_serializer = AvatarSerializer(
+                instance=self.avatar_queryset
+            )
 
         except (KeyError, ObjectDoesNotExist):
             # connection deny
             await self.close()
             return
         
-        # join group
-        self.group_name = 'game_main'
-        await self.channel_layer.group_add(self.group_name, self.channel_name)
+        # User already online
+        # if self.avatar_queryset.active:
+        #     await self.close()
+        #     return
 
+        # join group
+        self.group_name = 'map_{}'.format(self.current_map)
+        await self.channel_layer.group_add(self.group_name, self.channel_name)
+        
         # Accept websocket sub protocol
+        await self.accept(subprotocol=self.scope['validated']['token'])
         self.is_connect = True
         self.avatar_queryset.active = True
         self.avatar_queryset.save()
-        await self.accept(subprotocol=self.scope['validated']['token'])
-
+        
         await self.send_user_statistics()
 
+        await self.channel_layer.send(
+            'game_engine',
+            {
+                'type': 'set_avatar',
+                'map': self.current_map,
+                'name': self.avatar_name,
+                'loc': self.avatar_queryset.location
+            }
+        )
+
         # Send avatar initial location
-        for i in  Avatar.objects.filter(active=True):
-            await self.send_avatar('set', i.name, i.location)
+        # for i in  Avatar.objects.filter(active=True, current_map=self.current_map):
+        #     await self.send_avatar_to_group('set', i.name, i.location)
         
 
     async def disconnect(self, close_code):
         if self.is_connect:
             self.avatar_queryset.active = False
             self.avatar_queryset.save()
-            await self.send_avatar('unset')
+            await self.send_avatar_to_group('unset')
+            await self.channel_layer.group_discard(
+                self.group_name,
+                self.channel_name
+            )
 
     async def receive_json(self, text_data):
         '''
@@ -114,20 +139,19 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             pass
 
     async def send_user_statistics(self):
-        group_event = {
-            'type': 'dispatch_channel',
+        data = {
             'target': 'stats',
             'data': self.avatar_serializer.data
         }
 
-        await self.channel_layer.group_send(self.group_name, group_event)
+        await self.send_json(data)
 
-    async def send_avatar(self, state, name=None, location=None):
+    async def send_avatar_to_group(self, state, name=None, location=None):
         '''
         Send avatar information to group 
         '''
         if not name:
-            name = self.avatar_serializer.data['name']
+            name = self.avatar_name
         if not location:
             location = self.avatar_queryset.location
 
@@ -155,15 +179,22 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
         await self.send_json(payload)
         
     async def command_handler(self, command, data):
-        if command == 'move':
-            new_location = self.get_new_location(data['direction'])
+        await self.channel_layer.send(
+            "game_engine",
+            {
+                "type": "player.direction",
+                "data": "test_data!!"
+            },
+        )
+        # if command == 'move':
+        #     new_location = self.get_new_location(data['direction'])
 
-            if self.is_possible_location(new_location):
-                self.avatar_queryset.location = new_location
-                self.avatar_queryset.save()
-                await self.send_avatar('move')
-            else:
-                return
+        #     if self.is_possible_location(new_location):
+        #         self.avatar_queryset.location = new_location
+        #         self.avatar_queryset.save()
+        #         await self.send_avatar_to_group('move')
+        #     else:
+        #         return
     
     def get_new_location(self, direction):
         new_location = copy.deepcopy(self.avatar_queryset.location)
@@ -183,3 +214,35 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
         return 0 <= new_location[0] < 15 and 0 <= new_location[1] < 7
         
     
+class GameConsumer(SyncConsumer):
+    def __init__(self, *args, **kwargs):
+        """
+        Create on demeand when the first player joins.
+        """
+        super().__init__(*args, **kwargs)
+        self.engine = GameEngine()
+        self.engine.start()
+    
+    def set_avatar(self, event):
+        self.engine.set_avatar(event['name'], event['map'], event['loc'])
+        self.broadcast_avatars(event['map'])
+
+    def send_avatar(self, state, avatar):
+        group_name = "map_{}".format(avatar.map)
+        group_event = {
+            "type": "dispatch_channel",
+            "target": "avatar",
+            "data": {
+                "state": state,
+                "name": avatar.name,
+                "location": avatar.location
+            }
+        }
+
+        async_to_sync(self.channel_layer.group_send)(group_name, group_event)
+
+    def broadcast_avatars(self, map):
+        avatars = self.engine.get_avatars(map)
+        for avatar in avatars:
+            self.send_avatar('set', avatar)
+

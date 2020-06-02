@@ -65,6 +65,7 @@ class UserView(ValidateUserInputs):
 class LoginView(ValidateUserInputs):
     def post(self, request, username):
         self.set_user_serializer(username, request.data['password'])
+
         token_serializer = JWTSerializerWithUser(data=self.user_serializer.validated_data)
 
         if not token_serializer.is_valid():

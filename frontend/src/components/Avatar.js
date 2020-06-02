@@ -24,7 +24,7 @@ function Avatar(props) {
   const prevPosY = useRef()
   const [posX, posY] = props.pos
   const canvasRef = useRef(null);
-  const [avatarImg, setAvatarImg] = useState(new Image())
+  const [avatarImg] = useState(new Image())
   const directionMap = { SOUTH: 0, WEST: 1, EAST: 2, NORTH: 3 }
   const myChats = props.chats.filter(item => item.chat.from === props.name)
 

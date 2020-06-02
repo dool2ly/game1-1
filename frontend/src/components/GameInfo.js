@@ -57,7 +57,7 @@ function GameInfo(props) {
       <InfoTable />
       <UserStats stats={stats}/>
       <div className='btn-container'>
-        {elements.ButtonInMenu(1,'Logout', props.logout)}
+        {elements.ButtonInMenu(1, 'Logout', props.logout)}
       </div>
     </div>
   )
