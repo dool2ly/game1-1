@@ -1,5 +1,3 @@
-import json
-import copy
 import time
 
 from asgiref.sync import async_to_sync
@@ -101,26 +99,25 @@ class PlayerConsumer(AsyncJsonWebsocketConsumer):
         
         await self.send_user_statistics()
 
-        await self.channel_layer.send(
-            'game_engine',
+        await self.send_to_game_engine(
+            'new_avatar',
             {
-                'type': 'set_avatar',
-                'map': self.current_map,
-                'name': self.avatar_name,
-                'loc': self.avatar_queryset.location
+                "map": self.current_map,
+                "name": self.avatar_name,
+                "location": self.avatar_queryset.location
             }
         )
-
-        # Send avatar initial location
-        # for i in  Avatar.objects.filter(active=True, current_map=self.current_map):
-        #     await self.send_avatar_to_group('set', i.name, i.location)
-        
 
     async def disconnect(self, close_code):
         if self.is_connect:
             self.avatar_queryset.active = False
             self.avatar_queryset.save()
-            await self.send_avatar_to_group('unset')
+            await self.send_to_game_engine(
+                "unset_avatar",
+                {
+                    "name": self.avatar_name
+                }
+            )
             await self.channel_layer.group_discard(
                 self.group_name,
                 self.channel_name
@@ -134,9 +131,21 @@ class PlayerConsumer(AsyncJsonWebsocketConsumer):
             # make sure client animation speed
             if self.time_stamp + CLIENT_ANIMATION_SPEED < time.time():
                 self.time_stamp = time.time()
+
                 await self.command_handler(text_data['command'], text_data['data'])
+
         except KeyError:
             pass
+
+    async def send_to_game_engine(self, action, data):
+        await self.channel_layer.send(
+            "game_engine",
+            {
+                "type": "new_event",
+                "action": action,
+                "data": data
+            }
+        )
 
     async def send_user_statistics(self):
         data = {
@@ -145,27 +154,6 @@ class PlayerConsumer(AsyncJsonWebsocketConsumer):
         }
 
         await self.send_json(data)
-
-    async def send_avatar_to_group(self, state, name=None, location=None):
-        '''
-        Send avatar information to group 
-        '''
-        if not name:
-            name = self.avatar_name
-        if not location:
-            location = self.avatar_queryset.location
-
-        group_event = {
-            'type': 'dispatch_channel',
-            'target': 'avatar',
-            'data': {
-                'state': state,
-                'name': name,
-                'location': location
-            }
-        }
-
-        await self.channel_layer.group_send(self.group_name, group_event)
 
     async def dispatch_channel(self, event):
         '''
@@ -179,40 +167,15 @@ class PlayerConsumer(AsyncJsonWebsocketConsumer):
         await self.send_json(payload)
         
     async def command_handler(self, command, data):
-        await self.channel_layer.send(
-            "game_engine",
-            {
-                "type": "player.direction",
-                "data": "test_data!!"
-            },
-        )
-        # if command == 'move':
-        #     new_location = self.get_new_location(data['direction'])
+        if command == 'move':
+            await self.send_to_game_engine(
+                'move_avatar',
+                {
+                    "name": self.avatar_name,
+                    "direction": data['direction']
+                }
+            )
 
-        #     if self.is_possible_location(new_location):
-        #         self.avatar_queryset.location = new_location
-        #         self.avatar_queryset.save()
-        #         await self.send_avatar_to_group('move')
-        #     else:
-        #         return
-    
-    def get_new_location(self, direction):
-        new_location = copy.deepcopy(self.avatar_queryset.location)
-        
-        if direction == 'left':
-            new_location[0] -= 1
-        elif direction == 'right':
-            new_location[0] += 1
-        elif direction == 'up':
-            new_location[1] -= 1
-        elif direction == 'down':
-            new_location[1] += 1
-
-        return new_location
-        
-    def is_possible_location(self, new_location):
-        return 0 <= new_location[0] < 15 and 0 <= new_location[1] < 7
-        
     
 class GameConsumer(SyncConsumer):
     def __init__(self, *args, **kwargs):
@@ -223,26 +186,5 @@ class GameConsumer(SyncConsumer):
         self.engine = GameEngine()
         self.engine.start()
     
-    def set_avatar(self, event):
-        self.engine.set_avatar(event['name'], event['map'], event['loc'])
-        self.broadcast_avatars(event['map'])
-
-    def send_avatar(self, state, avatar):
-        group_name = "map_{}".format(avatar.map)
-        group_event = {
-            "type": "dispatch_channel",
-            "target": "avatar",
-            "data": {
-                "state": state,
-                "name": avatar.name,
-                "location": avatar.location
-            }
-        }
-
-        async_to_sync(self.channel_layer.group_send)(group_name, group_event)
-
-    def broadcast_avatars(self, map):
-        avatars = self.engine.get_avatars(map)
-        for avatar in avatars:
-            self.send_avatar('set', avatar)
-
+    def new_event(self, event):
+        self.engine.put_event(event['action'], event['data'])
