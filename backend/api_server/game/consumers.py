@@ -5,10 +5,10 @@ from django.core.exceptions import ObjectDoesNotExist
 from channels.generic.websocket import AsyncJsonWebsocketConsumer, SyncConsumer
 
 from .models import Avatar
-from .game_engine import GameEngine
+from .game_engine.core import GameEngine
 from .serializers import AvatarSerializer
 
-CLIENT_ANIMATION_SPEED = 0.350
+CLIENT_ANIMATION_SPEED = 0.350  # sec
 
 class ChatConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
@@ -110,8 +110,8 @@ class PlayerConsumer(AsyncJsonWebsocketConsumer):
 
     async def disconnect(self, close_code):
         if self.is_connect:
-            self.avatar_queryset.active = False
-            self.avatar_queryset.save()
+            # self.avatar_queryset.active = False
+            # self.avatar_queryset.save()
             await self.send_to_game_engine(
                 "unset_avatar",
                 {
@@ -138,6 +138,9 @@ class PlayerConsumer(AsyncJsonWebsocketConsumer):
             pass
 
     async def send_to_game_engine(self, action, data):
+        """
+        Forward user action to GameConsumer
+        """
         await self.channel_layer.send(
             "game_engine",
             {
@@ -148,6 +151,9 @@ class PlayerConsumer(AsyncJsonWebsocketConsumer):
         )
 
     async def send_user_statistics(self):
+        """
+        Send avatar status to user
+        """
         data = {
             'target': 'stats',
             'data': self.avatar_serializer.data
@@ -156,9 +162,9 @@ class PlayerConsumer(AsyncJsonWebsocketConsumer):
         await self.send_json(data)
 
     async def dispatch_channel(self, event):
-        '''
+        """
         Send data received from group to channel
-        '''
+        """
         payload = {
             'target': event['target'],
             'data': event['data']
