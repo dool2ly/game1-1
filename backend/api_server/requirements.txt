@@ -1,4 +1,4 @@
-Django==2.2.12
+Django==2.2.13
 django-cors-headers==3.2.1
 django-webpack-loader==0.7.0
 djangorestframework==3.11.0
@@ -19,7 +19,7 @@ channels-redis==2.4.2
 constantly==15.1.0
 cryptography==2.9.2
 daphne==2.5.0
-Django==2.2.12
+Django==2.2.13
 django-cors-headers==3.2.1
 django-webpack-loader==0.7.0
 djangorestframework==3.11.0
