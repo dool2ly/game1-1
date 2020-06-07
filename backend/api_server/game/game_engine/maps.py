@@ -12,7 +12,7 @@ map_settings = {
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         ],
         'monsters': [
-            monsters.Deer, monsters.Pig
+            monsters.Deer,
         ]
         
     },
@@ -28,7 +28,7 @@ map_settings = {
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         ],
         'monsters': [
-            monsters.Deer,
+            monsters.Deer, monsters.Pig
         ]
         
     },

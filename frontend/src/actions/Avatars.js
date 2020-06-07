@@ -2,7 +2,8 @@ import {
     SET_AVATAR,
     UNSET_AVATAR,
     MOVE_AVATAR,
-    RESET_AVATAR } from '../config/constants'
+    RESET_AVATAR
+} from '../config/constants'
 
 export const setAvatar = (name, location, active) => {
     return {

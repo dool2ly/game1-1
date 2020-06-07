@@ -2,7 +2,8 @@ import {
     SET_AVATAR,
     UNSET_AVATAR,
     MOVE_AVATAR,
-    RESET_AVATAR } from '../config/constants'
+    RESET_AVATAR
+} from '../config/constants'
 
 const initialState = []
 //ex [{ name: 'avatarName', location: [x,y]}]
@@ -10,7 +11,7 @@ const initialState = []
 const avatarsReducer = (state = initialState, action) => {
     const prev = [...state]
 
-    switch(action.type) {
+    switch (action.type) {
         case SET_AVATAR:
             let addFlag = true
             const ret = prev.map(item => {

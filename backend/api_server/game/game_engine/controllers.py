@@ -55,7 +55,7 @@ class MapController(object):
                 return map
 
     def get_random_location(self):
-        return [random.randint(0, MAP_WIDTH), random.randint(0, MAP_HEIGHT)]
+        return [random.randint(0, MAP_WIDTH-1), random.randint(0, MAP_HEIGHT-1)]
     
     def add_random_monster(self, map_id):
         map = self.get_map(map_id)

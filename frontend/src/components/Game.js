@@ -15,6 +15,7 @@ function Game(props) {
   const handleChat = useRef(null)
   const handleStats = useRef(null)
   const handleAvatars = useRef(null)
+  const handleMonsters = useRef(null)
   const isMountedRef = useIsMountedRef()
   const [toHome, setToHome] = useState(false)
   const moveCommands = [37, 38, 39, 40]
@@ -67,6 +68,9 @@ function Game(props) {
           case 'stats':
             handleStats.current(jsonData['data'])
             break
+          case 'monster':
+            handleMonsters.current(jsonData['data'])
+            break
           default:
             return
         }
@@ -94,7 +98,7 @@ function Game(props) {
     <div className='game'>
       {toHome && <Redirect to='/' />}
       <div>
-        <World handleAvatarsRef={handleAvatars} />
+        <World handleAvatarsRef={handleAvatars} handleMonstersRef={handleMonsters} />
         <Chat handleChatRef={handleChat} />
       </div>
       <GameInfo handleStatsRef={handleStats} />

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 
 import { OBJECT_WIDTH, OBJECT_HEIGHT } from '../config/constants'
@@ -20,12 +20,17 @@ function ChatBubble(props) {
 function Avatar(props) {
     const [posX, posY] = props.pos
     const myChats = props.chats.filter(item => item.chat.from === props.name)
+    
+    
+    useEffect(() => {
+        props.objectImg.src = walkAvatar
+    }, [props.objectImg])
 
     return (
         <div className='avatar' style={{ top: posY, left: posX }}>
-        { myChats.length !== 0 && <ChatBubble chat={myChats[0].chat} /> }
-        <canvas ref={props.canvasRef} width={OBJECT_WIDTH} height={OBJECT_HEIGHT} />
-        <div className='name-plate'><div>{props.name}</div></div>
+            { myChats.length !== 0 && <ChatBubble chat={myChats[0].chat} /> }
+            <canvas ref={props.canvasRef} width={OBJECT_WIDTH} height={OBJECT_HEIGHT} />
+            <div className='name-plate'><div>{props.name}</div></div>
         </div>
     )
 }
@@ -36,4 +41,4 @@ const mapStateToProps = (state) => {
     }
 }
 
-export default connect(mapStateToProps)(withAnimation(Avatar, walkAvatar))
+export default connect(mapStateToProps)(withAnimation(Avatar))

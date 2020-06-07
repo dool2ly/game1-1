@@ -1,5 +1,7 @@
 export const BACKEND_WS = 'ws://49.247.192.202:82/'
 
+export const ANIMATION_SPEED = 350
+
 export const CLOSE_ALERT = 'CLOSE_ALERT'
 export const CREATE_ALERT = 'CREATE_ALERT'
 
@@ -17,4 +19,4 @@ export const UNSET_AVATAR = 'UNSET_AVATAR'
 export const MOVE_AVATAR = 'MOVE_AVATAR'
 export const RESET_AVATAR = 'RESET_AVATAR'
 
-export const ANIMATION_SPEED = 350
+export const SET_MONSTER = 'SET_MONSTER'
