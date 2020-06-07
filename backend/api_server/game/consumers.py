@@ -115,7 +115,8 @@ class PlayerConsumer(AsyncJsonWebsocketConsumer):
             await self.send_to_game_engine(
                 "unset_avatar",
                 {
-                    "name": self.avatar_name
+                    "name": self.avatar_name,
+                    "map": self.current_map
                 }
             )
             await self.channel_layer.group_discard(
@@ -178,6 +179,7 @@ class PlayerConsumer(AsyncJsonWebsocketConsumer):
                 'move_avatar',
                 {
                     "name": self.avatar_name,
+                    "map": self.current_map,
                     "direction": data['direction']
                 }
             )

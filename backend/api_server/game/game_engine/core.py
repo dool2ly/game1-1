@@ -10,19 +10,6 @@ from game.models import Avatar as AvatarModel
 from .controllers import MapController
 
 
-class Avatar(object):
-    def __init__(self, name, map, location):
-        self.name = name
-        self.map = map
-        self.location = location
-    
-    def __repr__(self):
-        return "<object 'Avatar', {}>".format(self.name)
-    
-    def __str__(self):
-        return "avatar"
-
-
 class GameEngine(threading.Thread):
     def __init__(self):
         super().__init__()
@@ -51,41 +38,38 @@ class GameEngine(threading.Thread):
 
         async_to_sync(self.channel_layer.group_send)(group_name, group_event)
 
-    def broadcast_avatars(self, map):
+    def broadcast_avatars(self, map_id):
         """
         Send all avatars on the same map 
         """
-        for avatar in list(filter(lambda x: x.map == map, self.avatars)):
+        avatars = self.map_controller.get_avatars_on_map(map_id)
+        for avatar in avatars:
             self.send_object_to_group('set', avatar)
-
-    def get_avatar(self, name) -> list:
-        return list(filter(lambda x: x.name == name, self.avatars))
 
     def new_avatar(self, data) -> None:
         """
-        Add new avatar
+        Add new avatar to map
         """
-        if self.get_avatar(data['name']):
-            return
+        res = self.map_controller.add_avatar(
+            data['name'],
+            data['map'],
+            data['location']
+        )
 
-        avatar = Avatar(data['name'], data['map'], data['location'])
-        self.avatars.append(avatar)
-        self.broadcast_avatars(avatar.map)
+        if res:
+            self.broadcast_avatars(data['map'])
     
     def unset_avatar(self, data):
-         for i, avatar in enumerate(self.avatars):
-             if avatar.name == data['name']:
-                 target = self.avatars.pop(i)
-                 self.send_object_to_group('unset', target)
-
-                 avatar_queryset = AvatarModel.objects.get(name=data['name'])
-                 avatar_queryset.location = target.location
-                 avatar_queryset.active = False
-                 avatar_queryset.save()
-                 break
+        target = self.map_controller.pop_avatar(data['name'], data['map'])
+        if target:
+            self.send_object_to_group('unset', target)
+            avatar_queryset = AvatarModel.objects.get(name=data['name'])
+            avatar_queryset.location = target.location
+            avatar_queryset.active = False
+            avatar_queryset.save()
 
     def move_avatar(self, data) -> None:
-        avatar = self.get_avatar(data['name'])
+        avatar = self.map_controller.get_avatar(data['name'], data['map'])
 
         if avatar:
             avatar = avatar[0]
@@ -109,20 +93,11 @@ class GameEngine(threading.Thread):
             self.send_object_to_group('move', avatar)
 
     def handle_monster(self) -> None:
-        if not self.map_controller.is_monster_update:
-            return
-
-        activated_maps = []
-        for avatars in self.avatars:
-            if avatars.map not in activated_maps:
-                activated_maps.append(avatars.map)
-        
-        for map_id in activated_maps:
-            monster = self.map_controller.add_random_monster(map_id)
-            
-            if monster:
-                self.send_object_to_group('set', monster)
-                
+        if self.map_controller.is_monster_update():
+            for map_id in self.map_controller.get_activated_maps():
+                monster = self.map_controller.add_random_monster(map_id)
+                if monster:
+                    self.send_object_to_group('set', monster)
 
     def run(self) -> None:
         while True:
