@@ -11,12 +11,17 @@ import {
     unsetAvatar,
     resetAvatar
 } from '../actions/Avatars'
-import { setMonster } from '../actions/Monsters'
+import {
+    setMonster,
+    moveMonster,
+    unsetMonster,
+    resetMonster
+} from '../actions/Monsters'
 
 function World(props) {
     const { handleAvatarsRef, handleMonstersRef } = props
     const { setAvatar, moveAvatar, unsetAvatar, resetAvatar } = props
-    const { setMonster } = props
+    const { setMonster, moveMonster , unsetMonster, resetMonster } = props
 
     useEffect(() => {
         handleAvatarsRef.current = (data) => {
@@ -26,11 +31,11 @@ function World(props) {
         
             switch (data['state']) {
                 case 'set':
-                    setAvatar(data['name'], data['location'])
+                    setAvatar(data['name'], data['location'], data['direction'])
                     break
         
                 case 'move':
-                    moveAvatar(data['name'], data['location'])
+                    moveAvatar(data['name'], data['location'], data['direction'])
                     break
             
                 case 'unset':
@@ -50,6 +55,11 @@ function World(props) {
                 case 'set':
                     setMonster(data['id'], data['name'], data['location'])
                     break
+                
+                case 'move':
+                    moveMonster(data['id'], data['location'])
+                    break
+                
                 default:
                     return
             }
@@ -57,8 +67,9 @@ function World(props) {
     
         return () => {
             resetAvatar()
+            resetMonster()
         }
-    }, [handleAvatarsRef, handleMonstersRef, setAvatar, moveAvatar, unsetAvatar, resetAvatar, setMonster])
+    }, [handleAvatarsRef, handleMonstersRef, setAvatar, moveAvatar, unsetAvatar, resetAvatar, setMonster, moveMonster, unsetMonster, resetMonster])
     
     return (
         <div className='world'>
@@ -69,6 +80,7 @@ function World(props) {
                             key={i}
                             name={avatar['name']}
                             pos={avatar['location']}
+                            direction={avatar['direction']}
                         />
                     )
                 } else {
@@ -87,7 +99,16 @@ function World(props) {
     )
 }
 
-export default connect(
-    ({  avatars, monsters }) => ({  avatars, monsters }),
-    { setAvatar, moveAvatar, unsetAvatar, resetAvatar, setMonster }
-)(World)
+const mapStateToProps = ({ avatars, monsters }) => ({ avatars, monsters })
+const mapDispatchToProps = {
+    setAvatar,
+    moveAvatar,
+    unsetAvatar,
+    resetAvatar,
+    setMonster,
+    moveMonster,
+    unsetMonster,
+    resetMonster   
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(World)

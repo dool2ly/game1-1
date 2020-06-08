@@ -35,6 +35,8 @@ class GameEngine(threading.Thread):
         }
         if hasattr(obj, 'id'):
             group_event['data']['id'] = obj.id
+        if hasattr(obj, 'direction'):
+            group_event['data']['direction'] = obj.direction
 
         async_to_sync(self.channel_layer.group_send)(group_name, group_event)
 
@@ -45,6 +47,14 @@ class GameEngine(threading.Thread):
         avatars = self.map_controller.get_avatars_on_map(map_id)
         for avatar in avatars:
             self.send_object_to_group('set', avatar)
+
+    def broadcast_monsters(self, map_id):
+        """
+        Send all monsters on the same map
+        """
+        monsters = self.map_controller.get_monsters_on_map(map_id)
+        for monster in monsters:
+            self.send_object_to_group('set', monster)
 
     def new_avatar(self, data) -> None:
         """
@@ -58,6 +68,7 @@ class GameEngine(threading.Thread):
 
         if res:
             self.broadcast_avatars(data['map'])
+            self.broadcast_monsters(data['map'])
     
     def unset_avatar(self, data):
         target = self.map_controller.pop_avatar(data['name'], data['map'])
@@ -87,23 +98,39 @@ class GameEngine(threading.Thread):
             new_location[1] -= 1
         elif direction == 'down':
             new_location[1] += 1
-        
+
         if self.map_controller.is_possible_location(avatar.map, new_location):
             avatar.location = new_location
-            self.send_object_to_group('move', avatar)
+        elif avatar.direction == direction:
+            return
+
+        avatar.direction = direction
+        self.send_object_to_group('move', avatar)
 
     def handle_monster(self) -> None:
+        activated_maps = self.map_controller.get_activated_maps()
         if self.map_controller.is_monster_update():
-            for map_id in self.map_controller.get_activated_maps():
+            for map_id in activated_maps:
                 monster = self.map_controller.add_random_monster(map_id)
                 if monster:
                     self.send_object_to_group('set', monster)
+        
+        for map_id in activated_maps:
+            monsters = self.map_controller.get_monster_to_move(map_id)
+
+            for monster in monsters:
+                new_location = monster.random_move()
+
+                if self.map_controller.is_possible_location(map_id, new_location):
+                    monster.location = new_location
+                    self.send_object_to_group('move', monster)
+                    monster.update_movement()
 
     def run(self) -> None:
         while True:
             try:
                 self.handle_monster()
-                event = self._queue.get(timeout=3)
+                event = self._queue.get(block=False)
             except queue.Empty:
                 pass
             else:

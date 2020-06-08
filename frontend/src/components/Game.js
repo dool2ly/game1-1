@@ -21,7 +21,6 @@ function Game(props) {
   const moveCommands = [37, 38, 39, 40]
   const moveCommandsToServer = ['left', 'up', 'right', 'down']
   
-  
   // ComponentDidMount
   useEffect(() => {
     let timeStamp = 0
@@ -59,10 +58,11 @@ function Game(props) {
 
       webSocket.current.onmessage = (e) => {
         const jsonData = JSON.parse(e.data)
-        console.log("RECIEVE FROM SERVER", e.data)
+        
 
         switch (jsonData['target']) {
           case 'avatar':
+            console.log("RECIEVE FROM SERVER", e.data)
             handleAvatars.current(jsonData['data'])
             break
           case 'stats':
@@ -82,8 +82,6 @@ function Game(props) {
         window.removeEventListener('keydown', handleKeyDown)
       }
     } else {
-      // if does not have a token, redirect to home
-      // setTimeout(()=> setToHome(true), 3000)
       setToHome(true)
     }
   }, [token, moveCommands, moveCommandsToServer, isMountedRef])

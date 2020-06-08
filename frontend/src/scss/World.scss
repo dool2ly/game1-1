@@ -5,8 +5,17 @@
     width: $worldWidth;
     height: $worldHeight;
     background-color: #c77a35;
+    user-select: none;
 
     .avatar {
+      position: absolute;
+      width: $objectWidth;
+      height: $objectHeight;
+      transition: left .5s ease-in-out 0s, top .5s ease-in-out 0s;
+      z-index: 10;
+    }
+    
+    .monster {
       position: absolute;
       width: $objectWidth;
       height: $objectHeight;
@@ -54,23 +63,5 @@
       left: 16px;
     }
 
-    .monster {
-      position: absolute;
-      width: $objectWidth;
-      height: $objectHeight;
-      transition: left .5s ease-in-out 0s, top .5s ease-in-out 0s;
-    }
-    // .monster .name-plate {
-    //   display: flex;
-    //   justify-content: center;
-
-    //   div {
-    //     background: #d1ab89;
-    //     padding-left: 3px;
-    //     padding-right: 3px;
-    //     border-radius: 5px;
-    //     font-size: 0.8rem;
-    //   }
-    // }
 
   }

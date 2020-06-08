@@ -26,10 +26,11 @@ class Avatar(object):
         self.name = name
         self.map = map
         self.location = location
+        self.direction = 'down'
     
     def __repr__(self):
         return "<object 'Avatar', {}>".format(self.name)
-    
+
     def __str__(self):
         return "avatar"
 
@@ -64,7 +65,7 @@ class MapController(object):
         
         return self.maps[map_id].tiles[y][x] < 1
 
-    def check_others(self, map_id, location) -> bool:
+    def check_objects(self, map_id, location) -> bool:
         for avatar in self.maps[map_id].avatars:
             if avatar.location == location:
                 return False
@@ -78,7 +79,7 @@ class MapController(object):
     def is_possible_location(self, map_id, location) -> bool:
         if self.check_boundaries(location):
             if self.check_tiles(map_id, location):
-                if self.check_others(map_id, location):
+                if self.check_objects(map_id, location):
                     return True
 
         return False
@@ -87,6 +88,9 @@ class MapController(object):
         return [random.randint(0, MAP_WIDTH-1), random.randint(0, MAP_HEIGHT-1)]
     
     def add_random_monster(self, map_id):
+        """
+        Add one random available monster to map
+        """
         if len(self.maps[map_id].monsters) < self.maps[map_id].max_monster:
             random_idx = random.randint(0, len(self.maps[map_id].avail_monsters)-1)
             monster = self.maps[map_id].avail_monsters[random_idx]
@@ -112,6 +116,9 @@ class MapController(object):
     
     def get_avatars_on_map(self, map_id) -> list:
         return self.maps[map_id].avatars
+
+    def get_monsters_on_map(self, map_id) -> list:
+        return self.maps[map_id].monsters
 
     def add_avatar(self, name, map_id, location) -> bool:
         """
@@ -143,5 +150,12 @@ class MapController(object):
             if avatar.name == name:
                 return self.maps[map_id].avatars.pop(i)
 
+    def get_monster_to_move(self, map_id):
+        """
+        Return monsters that ready to monve
+        """
+        now = time.time()
+        return list(filter(lambda x: x.movement_time < now, self.maps[map_id].monsters))
 
+        
 

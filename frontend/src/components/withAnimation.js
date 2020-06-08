@@ -11,7 +11,7 @@ function withAnimation(InputComponent) {
         const prevPosY = useRef()
         const canvasRef = useRef(null)
         const [objectImg] = useState(new Image())
-        const directionMap = { SOUTH: 0, WEST: 1, EAST: 2, NORTH: 3 }
+        const directionMap = { down: 0, left: 1, right: 2, up: 3 }
 
         const handleCanvas = (action, dir = 0) => {
             if (canvasRef && canvasRef.current) {
@@ -60,7 +60,10 @@ function withAnimation(InputComponent) {
 
         useEffect(() => {            
             objectImg.onload = () => {
-                handleCanvas('draw', 0)
+                handleCanvas(
+                    'draw',
+                    props.direction? directionMap[props.direction] : 0
+                )
             }
         }, [])
 
@@ -68,18 +71,18 @@ function withAnimation(InputComponent) {
             prevPosX.current = props.pos[0]
             prevPosY.current = props.pos[1]
         }, [props.pos])
+        useEffect(() => {})
 
         if (props.pos[0] - prevPosX.current < 0) {
-            handleCanvas('animate', directionMap['WEST'])
-        }
-        if (props.pos[0] - prevPosX.current > 0) {
-            handleCanvas('animate', directionMap['EAST'])
-        }
-        if (props.pos[1] - prevPosY.current < 0) {
-            handleCanvas('animate', directionMap['NORTH'])
-        }
-        if (props.pos[1] - prevPosY.current > 0) {
-            handleCanvas('animate', directionMap['SOUTH'])
+            handleCanvas('animate', directionMap['left'])
+        } else if (props.pos[0] - prevPosX.current > 0) {
+            handleCanvas('animate', directionMap['right'])
+        } else if (props.pos[1] - prevPosY.current < 0) {
+            handleCanvas('animate', directionMap['up'])
+        } else if (props.pos[1] - prevPosY.current > 0) {
+            handleCanvas('animate', directionMap['down'])
+        } else if (props.direction) {
+            handleCanvas('draw', directionMap[props.direction])
         }
 
         return <InputComponent {...props} canvasRef={canvasRef} objectImg={objectImg} />
