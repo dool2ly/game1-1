@@ -41,7 +41,7 @@ class GameEngine(threading.Thread):
 
         async_to_sync(self.channel_layer.group_send)(group_name, group_event)
     
-    def send_event_to_group(self, map_id, event_type, name, target_id=None):
+    def send_event_to_group(self, map_id, event_type, name, target=None):
         group_name = "map_{}".format(map_id)
         group_event = {
             "type": "dispatch_channel",
@@ -49,9 +49,11 @@ class GameEngine(threading.Thread):
             "data": {
                 "type": event_type,
                 "from": name,
-                "to": target_id
+                "to": None
             }
         }
+        if target:
+            group_event['data']['to'] = {"id": target.id, "hp": target.hp}
 
         async_to_sync(self.channel_layer.group_send)(group_name, group_event)
 
@@ -162,11 +164,10 @@ class GameEngine(threading.Thread):
             attack_location
         )
         if target:
-            target_id = target.id
+            target.hp -= 10
 
-        self.send_event_to_group(avatar.map_id, 'attack', avatar.name, target_id)
+        self.send_event_to_group(avatar.map_id, 'attack', avatar.name, target)
             
-
     def run(self) -> None:
         while True:
             try:

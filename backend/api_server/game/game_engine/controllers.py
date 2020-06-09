@@ -38,12 +38,26 @@ class Avatar(object):
     def activate(self):
         self.map_id = self.query_set.current_map
         self.location = self.query_set.location
+        self.level = self.query_set.level
+        self.hp = self.query_set.health
+        self.mp = self.query_set.mana
+        self.max_hp = self.query_set.max_health
+        self.max_mp = self.query_set.max_mana
+        self.money = self.query_set.money
+
         self.query_set.active = True
         self.query_set.save()
     
     def deactivate(self):
         self.query_set.current_map = self.map_id
         self.query_set.location = self.location
+        self.query_set.level = self.level
+        self.query_set.health = self.hp
+        self.query_set.mana = self.mp
+        self.query_set.max_health = self.max_hp
+        self.query_set.max_mana = self.max_mp
+        self.query_set.money = self.money
+
         self.query_set.active = False
         self.query_set.save()
     

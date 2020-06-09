@@ -11,6 +11,7 @@ class Monster(object):
         self.map_id = map_id
         self.location = location
         self.movement_time = 0
+        self.hp = 100
 
         self.update_movement()
 
