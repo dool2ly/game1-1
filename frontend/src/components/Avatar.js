@@ -29,7 +29,7 @@ function Avatar(props) {
     return (
         <div className='avatar' style={{ top: posY, left: posX }}>
             { myChats.length !== 0 && <ChatBubble chat={myChats[0].chat} /> }
-            <canvas ref={props.canvasRef} width={OBJECT_WIDTH} height={OBJECT_HEIGHT} />
+            <canvas className='canvas1' ref={props.canvasRef} width={OBJECT_WIDTH} height={OBJECT_HEIGHT} />
             <div className='name-plate'><div>{props.name}</div></div>
         </div>
     )

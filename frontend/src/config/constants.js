@@ -1,6 +1,6 @@
 export const BACKEND_WS = 'ws://49.247.192.202:82/'
 
-export const ANIMATION_SPEED = 350
+export const ANIMATION_SPEED = 450
 
 export const CLOSE_ALERT = 'CLOSE_ALERT'
 export const CREATE_ALERT = 'CREATE_ALERT'

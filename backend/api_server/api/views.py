@@ -38,7 +38,6 @@ class UserView(ValidateUserInputs):
             self.user_serializer.save()
 
             # Create avatar
-            print(self.user_serializer.instance)
             user_avatar = Avatar(
                 name=self.user_serializer.validated_data['username'],
                 owner=self.user_serializer.instance,

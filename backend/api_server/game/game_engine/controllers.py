@@ -3,11 +3,16 @@ import random
 from collections import namedtuple
 
 from . import maps
+from . import utils
 
 MAP_WIDTH = 15
 MAP_HEIGHT = 7
 MONSTER_SPREAD_INTERVAL = 5 # sec
 MAX_MONSTER = 3
+DIRECTION_SOUTH = "down"
+DIRECTION_NORTH = "up"
+DIRECTION_WEST = "left"
+DIRECTION_EAST = "right"
 Map = namedtuple(
     'Map',
     [
@@ -22,11 +27,25 @@ Map = namedtuple(
 
 
 class Avatar(object):
-    def __init__(self, name, map, location):
+    def __init__(self, name, channel, query_set):
         self.name = name
-        self.map = map
-        self.location = location
-        self.direction = 'down'
+        self.direction = DIRECTION_SOUTH
+        self.channel = channel
+        self.query_set = query_set
+
+        self.activate()
+    
+    def activate(self):
+        self.map_id = self.query_set.current_map
+        self.location = self.query_set.location
+        self.query_set.active = True
+        self.query_set.save()
+    
+    def deactivate(self):
+        self.query_set.current_map = self.map_id
+        self.query_set.location = self.location
+        self.query_set.active = False
+        self.query_set.save()
     
     def __repr__(self):
         return "<object 'Avatar', {}>".format(self.name)
@@ -84,19 +103,16 @@ class MapController(object):
 
         return False
 
-    def get_random_location(self):
-        return [random.randint(0, MAP_WIDTH-1), random.randint(0, MAP_HEIGHT-1)]
-    
     def add_random_monster(self, map_id):
         """
         Add one random available monster to map
         """
         if len(self.maps[map_id].monsters) < self.maps[map_id].max_monster:
-            random_idx = random.randint(0, len(self.maps[map_id].avail_monsters)-1)
+            random_idx = random.randrange(0, len(self.maps[map_id].avail_monsters))
             monster = self.maps[map_id].avail_monsters[random_idx]
 
             while True:
-                location = self.get_random_location()
+                location = utils.get_random_location()
                 if self.is_possible_location(map_id, location):
                     break
 
@@ -114,22 +130,34 @@ class MapController(object):
             return []
         return list(filter(lambda x: x.name == name, current_map.avatars))
     
+    def get_avatar_by_name(self, name) -> list:
+        for map_id, map_instance in self.maps.items():
+            for avatar in map_instance.avatars:
+                if avatar.name == name:
+                    return avatar
+    
+    def get_monster_by_location(self, map_id, location):
+        for monster in self.maps[map_id].monsters:
+            if monster.location == location:
+                return monster
+    
     def get_avatars_on_map(self, map_id) -> list:
         return self.maps[map_id].avatars
 
     def get_monsters_on_map(self, map_id) -> list:
         return self.maps[map_id].monsters
 
-    def add_avatar(self, name, map_id, location) -> bool:
+    def add_avatar(self, name, channel, query_set):
         """
         Add new avatar
         """
-        if self.get_avatar(name, map_id):
-            return False
+        if self.get_avatar_by_name(name):
+            return None
 
-        avatar = Avatar(name, map_id, location)
+        avatar = Avatar(name, channel, query_set)
+        map_id = avatar.map_id
         self.maps[map_id].avatars.append(avatar)
-        return True
+        return avatar
     
     def get_activated_maps(self) -> list:
         """
@@ -157,5 +185,5 @@ class MapController(object):
         now = time.time()
         return list(filter(lambda x: x.movement_time < now, self.maps[map_id].monsters))
 
-        
+    
 

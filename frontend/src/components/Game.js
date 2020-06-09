@@ -10,104 +10,112 @@ import { BACKEND_WS, ANIMATION_SPEED } from '../config/constants'
 
 
 function Game(props) {
-  const { token } = props
-  const webSocket = useRef(null)
-  const handleChat = useRef(null)
-  const handleStats = useRef(null)
-  const handleAvatars = useRef(null)
-  const handleMonsters = useRef(null)
-  const isMountedRef = useIsMountedRef()
-  const [toHome, setToHome] = useState(false)
-  const moveCommands = [37, 38, 39, 40]
-  const moveCommandsToServer = ['left', 'up', 'right', 'down']
-  
-  // ComponentDidMount
-  useEffect(() => {
-    let timeStamp = 0
+    const { token } = props
+    const webSocket = useRef(null)
+    const handleChat = useRef(null)
+    const handleStats = useRef(null)
+    const handleAvatars = useRef(null)
+    const handleMonsters = useRef(null)
+    const isMountedRef = useIsMountedRef()
+    const [toHome, setToHome] = useState(false)
+    const moveCommands = [37, 38, 39, 40]
+    const moveCommandsToServer = ['left', 'up', 'right', 'down']
 
-    // User input handler
-    const handleKeyDown = (e) => {
-      if (timeStamp + ANIMATION_SPEED < Date.now()) {
-        timeStamp = Date.now()
+    // ComponentDidMount
+    useEffect(() => {
+        let timeStamp = 0
 
-        if (e.key === 'Enter') {
-          handleChat.current.focus()
-        } else {
-          let idx = moveCommands.indexOf(e.keyCode)
-          if (idx !== -1){
-            e.preventDefault()
-            UserCmdToServer('move', { direction: moveCommandsToServer[idx] })
-          }
+        // User input handler
+        const handleKeyDown = (e) => {
+            if (timeStamp + ANIMATION_SPEED < Date.now()) {
+                timeStamp = Date.now()
+
+                if (e.key === 'Enter') {
+                    handleChat.current.focus()
+                } else {
+                    const idx = moveCommands.indexOf(e.keyCode)
+            
+                    if (idx !== -1) {
+                        e.preventDefault()
+                        userCmdToServer('move', { direction: moveCommandsToServer[idx] })
+                    }
+
+                    if (e.keyCode === 32) { // 32: Space bar
+                        e.preventDefault()
+                        userCmdToServer('attack')
+                    }
+                }
+            }
         }
-      }
-    }
+    
 
-    if (token) {
-      window.addEventListener('keydown', handleKeyDown)
+        if (token) {
+            window.addEventListener('keydown', handleKeyDown)
 
-      // Websocket connection attempt
-      webSocket.current = new WebSocket(BACKEND_WS + 'ws/game', token)
+            webSocket.current = new WebSocket(BACKEND_WS + 'ws/game', token)
 
-      webSocket.current.onclose = (e) => {
-        // Websocket connection close
-        console.log('disconnected game server')
-        if (isMountedRef.current){
-          setToHome(true)
-        }
-      }
+            webSocket.current.onclose = (e) => {
+                console.log('disconnected game server')
+                if (isMountedRef.current){
+                    setToHome(true)
+                }
+            }
 
-      webSocket.current.onmessage = (e) => {
-        const jsonData = JSON.parse(e.data)
+            webSocket.current.onmessage = (e) => {
+                const jsonData = JSON.parse(e.data)
+                if (jsonData['target'] !== 'monster') {
+                    console.log("RECIEVE FROM SERVER", e.data)
+                }
         
+                switch (jsonData['target']) {
+                    case 'avatar':
+                        
+                        handleAvatars.current(jsonData['data'])
+                        break
+                    case 'stats':
+                        handleStats.current(jsonData['data'])
+                        break
+                    case 'monster':
+                        handleMonsters.current(jsonData['data'])
+                        break
+                    default:
+                        return
+                }
+            }
 
-        switch (jsonData['target']) {
-          case 'avatar':
-            console.log("RECIEVE FROM SERVER", e.data)
-            handleAvatars.current(jsonData['data'])
-            break
-          case 'stats':
-            handleStats.current(jsonData['data'])
-            break
-          case 'monster':
-            handleMonsters.current(jsonData['data'])
-            break
-          default:
-            return
+            // componentWillUnmount
+            return () => {
+                webSocket.current.close()
+                window.removeEventListener('keydown', handleKeyDown)
+            }
+        } else {
+            setToHome(true)
         }
-      }
-  
-      // componentWillUnmount
-      return () => {
-        webSocket.current.close()
-        window.removeEventListener('keydown', handleKeyDown)
-      }
-    } else {
-      setToHome(true)
-    }
-  }, [token, moveCommands, moveCommandsToServer, isMountedRef])
+    }, [token, moveCommands, moveCommandsToServer, isMountedRef])
 
-  const UserCmdToServer = (command, data) => {
-    if (webSocket.current != null) {
-      webSocket.current.send(JSON.stringify({ command, data }))
+    const userCmdToServer = (command, data=null) => {
+        if (webSocket.current != null) {
+            
+            webSocket.current.send(JSON.stringify({ command, data }))
+        }
     }
-  }
 
-  return (
+    return (
     <div className='game'>
-      {toHome && <Redirect to='/' />}
-      <div>
-        <World handleAvatarsRef={handleAvatars} handleMonstersRef={handleMonsters} />
-        <Chat handleChatRef={handleChat} />
-      </div>
-      <GameInfo handleStatsRef={handleStats} />
+        <div>
+            <World handleAvatarsRef={handleAvatars} handleMonstersRef={handleMonsters} />
+            <Chat handleChatRef={handleChat} />
+        </div>
+        <GameInfo handleStatsRef={handleStats} />
+        {toHome && <Redirect to='/' />}
     </div>
-  )
+    )
 }
 
 const mapStateToProps = (state) => {
-  return {
-    ...state.user
-  }
+    return {
+        ...state.user
+    }
 }
 
 export default connect(mapStateToProps)(Game)

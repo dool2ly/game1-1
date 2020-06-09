@@ -6,9 +6,9 @@ import random
 class Monster(object):
     name = ''
 
-    def __init__(self, id, map, location):
+    def __init__(self, id, map_id, location):
         self.id = id
-        self.map = map
+        self.map_id = map_id
         self.location = location
         self.movement_time = 0
 

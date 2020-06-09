@@ -10,13 +10,13 @@ import {
     moveAvatar,
     unsetAvatar,
     resetAvatar
-} from '../actions/Avatars'
+} from '../actions/Avatar'
 import {
     setMonster,
     moveMonster,
     unsetMonster,
     resetMonster
-} from '../actions/Monsters'
+} from '../actions/Monster'
 
 function World(props) {
     const { handleAvatarsRef, handleMonstersRef } = props
@@ -73,7 +73,7 @@ function World(props) {
     
     return (
         <div className='world'>
-            {props.avatars && props.avatars.map((avatar, i) => {
+            {props.avatar && props.avatar.map((avatar, i) => {
                 if (avatar.active) {
                     return (
                         <Avatar
@@ -88,7 +88,7 @@ function World(props) {
                 }
             })}
             
-            {props.monsters && props.monsters.map((monster, i) => (
+            {props.monster && props.monster.map((monster, i) => (
                 <Monster
                     key={'m' + i}
                     name={monster['name']}
@@ -99,7 +99,7 @@ function World(props) {
     )
 }
 
-const mapStateToProps = ({ avatars, monsters }) => ({ avatars, monsters })
+const mapStateToProps = ({ avatar, monster }) => ({ avatar, monster })
 const mapDispatchToProps = {
     setAvatar,
     moveAvatar,

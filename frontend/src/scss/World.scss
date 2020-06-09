@@ -12,7 +12,10 @@
       width: $objectWidth;
       height: $objectHeight;
       transition: left .5s ease-in-out 0s, top .5s ease-in-out 0s;
-      z-index: 10;
+      canvas {
+        position: absolute;
+        z-index:20;
+      }
     }
     
     .monster {
@@ -20,11 +23,17 @@
       width: $objectWidth;
       height: $objectHeight;
       transition: left .5s ease-in-out 0s, top .5s ease-in-out 0s;
+      canvas {
+        position: absolute;
+        z-index:20;
+      }
     }
 
     .name-plate {
       display: flex;
       justify-content: center;
+      position: absolute;
+      top: $objectHeight;
 
       div {
         background: #d1ab89;
@@ -44,6 +53,7 @@
       bottom: 77px;
       left: -15%;
       font-size: 0.8rem;
+      z-index: 50;
       
       span {
         font-weight: 600;

@@ -1,13 +1,14 @@
 import threading
 import time
 import queue
-import copy
 
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 
+from . import utils
+from . import controllers
 from game.models import Avatar as AvatarModel
-from .controllers import MapController
+from game.serializers import AvatarSerializer
 
 
 class GameEngine(threading.Thread):
@@ -16,14 +17,14 @@ class GameEngine(threading.Thread):
         self._queue = queue.Queue()
         self.avatars = []
         self.channel_layer = get_channel_layer()
-        self.map_controller = MapController()
+        self.map_controller = controllers.MapController()
     
     def put_event(self, action, data):
         item = {'action': action, 'data': data}
         self._queue.put(item)
 
     def send_object_to_group(self, state, obj):
-        group_name = "map_{}".format(obj.map)
+        group_name = "map_{}".format(obj.map_id)
         group_event = {
             "type": "dispatch_channel",
             "target": str(obj),
@@ -37,6 +38,20 @@ class GameEngine(threading.Thread):
             group_event['data']['id'] = obj.id
         if hasattr(obj, 'direction'):
             group_event['data']['direction'] = obj.direction
+
+        async_to_sync(self.channel_layer.group_send)(group_name, group_event)
+    
+    def send_event_to_group(self, map_id, event_type, name, target_id=None):
+        group_name = "map_{}".format(map_id)
+        group_event = {
+            "type": "dispatch_channel",
+            "target": "event",
+            "data": {
+                "type": event_type,
+                "from": name,
+                "to": target_id
+            }
+        }
 
         async_to_sync(self.channel_layer.group_send)(group_name, group_event)
 
@@ -56,50 +71,53 @@ class GameEngine(threading.Thread):
         for monster in monsters:
             self.send_object_to_group('set', monster)
 
+    def send_avatar_statistics(self, avatar):
+        serializer = AvatarSerializer(instance=avatar.query_set)
+        event_data = {
+            "type": "dispatch_channel",
+            "target": "stats",
+            "data": serializer.data
+        }
+        async_to_sync(self.channel_layer.send)(avatar.channel, event_data)
+
     def new_avatar(self, data) -> None:
         """
         Add new avatar to map
         """
-        res = self.map_controller.add_avatar(
-            data['name'],
-            data['map'],
-            data['location']
-        )
+        query_set = AvatarModel.objects.get(name=data['name'])
+        if query_set:
+            avatar = self.map_controller.add_avatar(
+                data['name'],
+                data['channel'],
+                query_set
+            )
 
-        if res:
-            self.broadcast_avatars(data['map'])
-            self.broadcast_monsters(data['map'])
+            if avatar:
+                self.broadcast_avatars(avatar.map_id)
+                self.broadcast_monsters(avatar.map_id)
+                self.send_avatar_statistics(avatar)
     
     def unset_avatar(self, data):
-        target = self.map_controller.pop_avatar(data['name'], data['map'])
-        if target:
-            self.send_object_to_group('unset', target)
-            avatar_queryset = AvatarModel.objects.get(name=data['name'])
-            avatar_queryset.location = target.location
-            avatar_queryset.active = False
-            avatar_queryset.save()
+        avatar = self.map_controller.pop_avatar(data['name'], data['map'])
+        if avatar:
+            self.send_object_to_group('unset', avatar)
+            avatar.deactivate()
+            
 
     def move_avatar(self, data) -> None:
         avatar = self.map_controller.get_avatar(data['name'], data['map'])
-
         if avatar:
             avatar = avatar[0]
         else:
             return
 
         direction = data['direction']
-        new_location = copy.deepcopy(avatar.location)
+        new_location = utils.get_location_by_direction(
+            avatar.location,
+            direction
+        )
 
-        if direction == 'left':
-            new_location[0] -= 1
-        elif direction == 'right':
-            new_location[0] += 1
-        elif direction == 'up':
-            new_location[1] -= 1
-        elif direction == 'down':
-            new_location[1] += 1
-
-        if self.map_controller.is_possible_location(avatar.map, new_location):
+        if self.map_controller.is_possible_location(avatar.map_id, new_location):
             avatar.location = new_location
         elif avatar.direction == direction:
             return
@@ -125,6 +143,29 @@ class GameEngine(threading.Thread):
                     monster.location = new_location
                     self.send_object_to_group('move', monster)
                     monster.update_movement()
+    
+    def attack_avatar(self, data):
+        avatar = self.map_controller.get_avatar(data['name'], data['map'])
+        if avatar:
+            avatar = avatar[0]
+        else:
+            return
+
+        attack_location = utils.get_location_by_direction(
+            avatar.location,
+            avatar.direction
+        )
+
+        target_id = None
+        target = self.map_controller.get_monster_by_location(
+            avatar.map_id,
+            attack_location
+        )
+        if target:
+            target_id = target.id
+
+        self.send_event_to_group(avatar.map_id, 'attack', avatar.name, target_id)
+            
 
     def run(self) -> None:
         while True:
@@ -136,12 +177,14 @@ class GameEngine(threading.Thread):
             else:
                 action = event['action']
 
-                if action == 'new_avatar':
+                if action == "new_avatar":
                     self.new_avatar(event['data'])
-                elif action == 'move_avatar':
+                elif action == "move_avatar":
                     self.move_avatar(event['data'])
-                elif action == 'unset_avatar':
+                elif action == "unset_avatar":
                     self.unset_avatar(event['data'])
+                elif action == "attack_avatar":
+                    self.attack_avatar(event['data'])
                 else:
                     print('Unknown action,',event['action'], event['data'])
             

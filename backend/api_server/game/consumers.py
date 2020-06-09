@@ -1,14 +1,13 @@
 import time
 
-from asgiref.sync import async_to_sync
 from django.core.exceptions import ObjectDoesNotExist
 from channels.generic.websocket import AsyncJsonWebsocketConsumer, SyncConsumer
 
 from .models import Avatar
 from .game_engine.core import GameEngine
-from .serializers import AvatarSerializer
 
-CLIENT_ANIMATION_SPEED = 0.350  # sec
+CLIENT_ANIMATION_SPEED = 0.450  # sec
+
 
 class ChatConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
@@ -70,12 +69,9 @@ class PlayerConsumer(AsyncJsonWebsocketConsumer):
             user = self.scope['validated']['user']
             self.username = str(user)
             
-            self.avatar_queryset = user.avatar_set.get()
-            self.avatar_name = self.avatar_queryset.name
-            self.current_map = self.avatar_queryset.current_map
-            self.avatar_serializer = AvatarSerializer(
-                instance=self.avatar_queryset
-            )
+            avatar_queryset = user.avatar_set.get()
+            self.avatar_name = avatar_queryset.name
+            self.current_map = avatar_queryset.current_map
 
         except (KeyError, ObjectDoesNotExist):
             # connection deny
@@ -83,7 +79,7 @@ class PlayerConsumer(AsyncJsonWebsocketConsumer):
             return
         
         # User already online
-        # if self.avatar_queryset.active:
+        # if avatar_queryset.active:
         #     await self.close()
         #     return
 
@@ -94,24 +90,17 @@ class PlayerConsumer(AsyncJsonWebsocketConsumer):
         # Accept websocket sub protocol
         await self.accept(subprotocol=self.scope['validated']['token'])
         self.is_connect = True
-        self.avatar_queryset.active = True
-        self.avatar_queryset.save()
         
-        await self.send_user_statistics()
-
         await self.send_to_game_engine(
             'new_avatar',
             {
-                "map": self.current_map,
                 "name": self.avatar_name,
-                "location": self.avatar_queryset.location
+                "channel": self.channel_name
             }
         )
 
     async def disconnect(self, close_code):
         if self.is_connect:
-            # self.avatar_queryset.active = False
-            # self.avatar_queryset.save()
             await self.send_to_game_engine(
                 "unset_avatar",
                 {
@@ -147,20 +136,9 @@ class PlayerConsumer(AsyncJsonWebsocketConsumer):
             {
                 "type": "new_event",
                 "action": action,
-                "data": data
+                "data": data,
             }
         )
-
-    async def send_user_statistics(self):
-        """
-        Send avatar status to user
-        """
-        data = {
-            'target': 'stats',
-            'data': self.avatar_serializer.data
-        }
-
-        await self.send_json(data)
 
     async def dispatch_channel(self, event):
         """
@@ -174,15 +152,20 @@ class PlayerConsumer(AsyncJsonWebsocketConsumer):
         await self.send_json(payload)
         
     async def command_handler(self, command, data):
-        if command == 'move':
-            await self.send_to_game_engine(
-                'move_avatar',
-                {
-                    "name": self.avatar_name,
-                    "map": self.current_map,
-                    "direction": data['direction']
-                }
-            )
+        action_type = ""
+        action_data = {"name": self.avatar_name, "map": self.current_map}
+        
+        if command == "move":
+            action_type = "move_avatar"
+            action_data["direction"] = data['direction']
+
+        elif command == 'attack':
+            action_type = "attack_avatar"
+        else:
+            return
+
+        await self.send_to_game_engine(action_type, action_data)
+  
 
     
 class GameConsumer(SyncConsumer):
