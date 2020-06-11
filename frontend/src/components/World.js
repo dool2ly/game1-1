@@ -16,13 +16,14 @@ import {
     setMonster,
     moveMonster,
     unsetMonster,
-    resetMonster
+    resetMonster,
+    hitMonster
 } from '../actions/Monster'
 
 function World(props) {
     const { handleAvatarsRef, handleMonstersRef, handleEventRef } = props
     const { attackAvatar, setAvatar, moveAvatar, unsetAvatar, resetAvatar } = props
-    const { setMonster, moveMonster , unsetMonster, resetMonster } = props
+    const { setMonster, moveMonster , unsetMonster, resetMonster, hitMonster } = props
 
     useEffect(() => {
         handleAvatarsRef.current = (data) => {
@@ -70,6 +71,10 @@ function World(props) {
             switch (data['type']) {
                 case 'attack':
                     attackAvatar(data['from'])
+                    if (data['to']) {
+                        hitMonster(data['to']['id'], data['to']['hp'])
+                    }
+                    
                 default:
                     return
             }
@@ -80,7 +85,7 @@ function World(props) {
             resetAvatar()
             resetMonster()
         }
-    }, [handleEventRef, handleAvatarsRef, handleMonstersRef, setAvatar, moveAvatar, attackAvatar, unsetAvatar, resetAvatar, setMonster, moveMonster, unsetMonster, resetMonster])
+    }, [handleEventRef, handleAvatarsRef, handleMonstersRef, setAvatar, moveAvatar, attackAvatar, unsetAvatar, resetAvatar, setMonster, moveMonster, unsetMonster, resetMonster, hitMonster])
     
     return (
         <div className='world'>
@@ -104,6 +109,7 @@ function World(props) {
                 <Monster
                     key={'m' + i}
                     name={monster['name']}
+                    hp={monster['hp']}
                     pos={monster['location']}
                     attack={monster['attack']}
                 />
@@ -122,7 +128,8 @@ const mapDispatchToProps = {
     setMonster,
     moveMonster,
     unsetMonster,
-    resetMonster   
+    resetMonster,
+    hitMonster   
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(World)

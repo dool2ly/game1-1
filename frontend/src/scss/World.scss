@@ -23,10 +23,24 @@
       width: $objectWidth;
       height: $objectHeight;
       transition: left .5s ease-in-out 0s, top .5s ease-in-out 0s;
+
       canvas {
         position: absolute;
         z-index:20;
       }
+      .meter {
+        width: $objectWidth;
+        height: 7px;
+        background-color: rgb(110, 110, 110);
+        position: absolute;
+        bottom: $objectHeight;
+        span {
+          position: absolute;
+          height: 100%;
+          background-color: rgb(207, 26, 26);
+        }
+      }
+
     }
 
     .name-plate {

@@ -3,7 +3,8 @@ import {
     MOVE_MONSTER,
     UNSET_MONSTER,
     RESET_MONSTER,
-    ATTACK_MONSTER
+    ATTACK_MONSTER,
+    HIT_MONSTER
 } from '../config/constants'
 
 const initialState = []
@@ -22,6 +23,14 @@ const monstersReducer = (state = initialState, action) => {
                 : item
             )
  
+        case HIT_MONSTER:
+            return prev.map(item => {
+                    if (item.id === action.payload.id) {
+                        item.hp[0] = action.payload.hp
+                    }
+                    return item
+                }
+            )
         case MOVE_MONSTER:
             return prev.map(
                 item => item.id === action.payload.id

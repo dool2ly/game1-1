@@ -3,7 +3,8 @@ import {
     MOVE_MONSTER,
     RESET_MONSTER,
     UNSET_MONSTER,
-    ATTACK_MONSTER
+    ATTACK_MONSTER,
+    HIT_MONSTER
 } from '../config/constants'
 
 export const setMonster = (id, name, location, hp) => {
@@ -28,7 +29,15 @@ export const moveMonster = (id, location) => {
         }
     }
 }
-
+export const hitMonster = (id, hp) => {
+    return {
+        type: HIT_MONSTER,
+        payload: {
+            id,
+            hp
+        }
+    }
+}
 export const attackMonster = (name) => {
     return {
         type: ATTACK_MONSTER,
