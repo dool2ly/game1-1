@@ -1,6 +1,7 @@
 import threading
 import time
 import queue
+import random
 
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
@@ -141,10 +142,16 @@ class GameEngine(threading.Thread):
             monsters = self.map_controller.get_monster_to_move(map_id)
 
             for monster in monsters:
-                new_location = monster.random_move()
+                randIdx = random.randrange(0, 4)
+                direction = utils.map_to_direction[randIdx]
+                new_location = utils.get_location_by_direction(
+                    monster.location,
+                    direction
+                )
 
                 if self.map_controller.is_possible_location(map_id, new_location):
                     monster.location = new_location
+                    monster.direction = direction
                     self.send_object_to_group('move', monster)
                     monster.update_movement()
     
@@ -167,6 +174,8 @@ class GameEngine(threading.Thread):
         )
         if target:
             target.hp -= 10
+            if target.hp <= 0:
+                self.map_controller.pop_monster(target.map_id, target.id)
 
         self.send_event_to_group(avatar.map_id, 'attack', avatar.name, target)
             

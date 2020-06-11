@@ -12,8 +12,9 @@ map_settings = {
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         ],
         'monsters': [
-            monsters.Deer,
-        ]
+            monsters.Deer, monsters.Pig
+        ],
+        'max_monster': 5
         
     },
     
@@ -29,7 +30,7 @@ map_settings = {
         ],
         'monsters': [
             monsters.Deer, monsters.Pig
-        ]
-        
+        ],
+        'max_monster': 10
     },
 }

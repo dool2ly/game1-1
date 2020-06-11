@@ -23,6 +23,7 @@ import {
 function World(props) {
     const { handleAvatarsRef, handleMonstersRef, handleEventRef } = props
     const { attackAvatar, setAvatar, moveAvatar, unsetAvatar, resetAvatar } = props
+    
     const { setMonster, moveMonster , unsetMonster, resetMonster, hitMonster } = props
 
     useEffect(() => {
@@ -55,7 +56,13 @@ function World(props) {
 
             switch (data['state']) {
                 case 'set':
-                    setMonster(data['id'], data['name'], data['location'], data['hp'])
+                    setMonster(
+                        data['id'],
+                        data['name'],
+                        data['location'],
+                        data['direction'],
+                        data['hp']
+                    )
                     break
                 
                 case 'move':
@@ -72,7 +79,14 @@ function World(props) {
                 case 'attack':
                     attackAvatar(data['from'])
                     if (data['to']) {
-                        hitMonster(data['to']['id'], data['to']['hp'])
+                        const hp = data['to']['hp']
+                        if (hp <= 0){
+                            // TODO: monster die
+                            console.log(data['to']['id'], 'is dead')
+                            unsetMonster(data['to']['id'])
+                        } else {
+                            hitMonster(data['to']['id'], hp)
+                        }
                     }
                     
                 default:
@@ -85,11 +99,11 @@ function World(props) {
             resetAvatar()
             resetMonster()
         }
-    }, [handleEventRef, handleAvatarsRef, handleMonstersRef, setAvatar, moveAvatar, attackAvatar, unsetAvatar, resetAvatar, setMonster, moveMonster, unsetMonster, resetMonster, hitMonster])
+    }, [handleEventRef, handleAvatarsRef, handleMonstersRef, attackAvatar, setAvatar, moveAvatar, unsetAvatar, resetAvatar, setMonster, moveMonster, unsetMonster, resetMonster, hitMonster])
     
     return (
         <div className='world'>
-            {props.avatar && props.avatar.map((avatar, i) => {
+            {/* {props.avatar && props.avatar.map((avatar, i) => {
                 if (avatar.active) {
                     return (
                         <Avatar
@@ -103,15 +117,25 @@ function World(props) {
                 } else {
                     return null
                 }
-            })}
+            })} */}
+            {props.avatar && props.avatar.map(avatar => (
+                <Avatar
+                    key={avatar['name']}
+                    name={avatar['name']}
+                    pos={avatar['location']}
+                    attack={avatar['attack']}
+                    direction={avatar['direction']}
+                />
+            ))}
             
-            {props.monster && props.monster.map((monster, i) => (
+            {props.monster && props.monster.map(monster => (
                 <Monster
-                    key={'m' + i}
+                    key={'m' + monster['id']}
                     name={monster['name']}
                     hp={monster['hp']}
                     pos={monster['location']}
                     attack={monster['attack']}
+                    direction={monster['direction']}
                 />
             ))}
         </div>

@@ -8,7 +8,7 @@ from . import utils
 MAP_WIDTH = 15
 MAP_HEIGHT = 7
 MONSTER_SPREAD_INTERVAL = 5 # sec
-MAX_MONSTER = 1
+MAX_MONSTER = 3
 DIRECTION_SOUTH = "down"
 DIRECTION_NORTH = "up"
 DIRECTION_WEST = "left"
@@ -83,7 +83,7 @@ class MapController(object):
                     avatars = [],
                     monsters = [],
                     avail_monsters = info['monsters'],
-                    max_monster=MAX_MONSTER
+                    max_monster= info['max_monster']
             )
     
     def is_monster_update(self) -> bool:
@@ -198,6 +198,15 @@ class MapController(object):
         """
         now = time.time()
         return list(filter(lambda x: x.movement_time < now, self.maps[map_id].monsters))
+    
+    def pop_monster(self, map_id, monster_id):
+        """
+        Remove avatar and return removed avatar
+        """
+        for i, monster in enumerate(self.maps[map_id].monsters):
+            if monster.id == monster_id:
+                return self.maps[map_id].monsters.pop(i)
+
 
     
 

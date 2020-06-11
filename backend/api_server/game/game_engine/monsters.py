@@ -2,6 +2,7 @@ import time
 import copy
 import random
 
+from . import controllers
 
 class Monster(object):
     name = ''
@@ -13,6 +14,7 @@ class Monster(object):
         self.location = location
         self.movement_time = 0
         self.hp = self.max_hp
+        self.direction = controllers.DIRECTION_SOUTH
 
         self.update_movement()
 

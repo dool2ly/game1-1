@@ -45,11 +45,7 @@ const avatarsReducer = (state = initialState, action) => {
             )
 
         case UNSET_AVATAR:
-            return prev.map(
-                item => item.name === action.payload.name
-                ? { ...item, active: false }
-                : item
-            )
+            return prev.filter(item => item.name !== action.payload.name)
         
         case RESET_AVATAR:
             return initialState

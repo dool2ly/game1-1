@@ -14,7 +14,21 @@ const monstersReducer = (state = initialState, action) => {
 
     switch (action.type) {
         case SET_MONSTER:
-            return prev.concat(action.payload)
+            let addFlag = true
+            const ret = prev.map(item => {
+                if (item.id === action.payload.id) {
+                    addFlag = false
+                    return { ...action.payload }
+                } else {
+                    return item
+                }
+            })
+
+            if (addFlag) {
+                return ret.concat(action.payload)
+            }
+            
+            return ret
         
         case ATTACK_MONSTER:
             return prev.map(
@@ -31,6 +45,7 @@ const monstersReducer = (state = initialState, action) => {
                     return item
                 }
             )
+            
         case MOVE_MONSTER:
             return prev.map(
                 item => item.id === action.payload.id

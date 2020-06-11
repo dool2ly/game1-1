@@ -2,6 +2,12 @@ import copy
 import random 
 from . import controllers
 
+map_to_direction = [
+    controllers.DIRECTION_WEST,
+    controllers.DIRECTION_EAST,
+    controllers.DIRECTION_NORTH,
+    controllers.DIRECTION_SOUTH
+]
 def get_location_by_direction(location, direction):
     new_location = copy.deepcopy(location)
 
