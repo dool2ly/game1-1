@@ -2,7 +2,8 @@ import {
     SET_AVATAR,
     UNSET_AVATAR,
     MOVE_AVATAR,
-    RESET_AVATAR
+    RESET_AVATAR,
+    ATTACK_AVATAR
 } from '../config/constants'
 
 const initialState = []
@@ -28,7 +29,14 @@ const avatarsReducer = (state = initialState, action) => {
             }
             
             return ret
-            
+
+        case ATTACK_AVATAR:
+            return prev.map(
+                item => item.name === action.payload.name
+                ? { ...item, attack: Date.now() }
+                : item
+            )
+
         case MOVE_AVATAR:
             return prev.map(
                 item => item.name === action.payload.name

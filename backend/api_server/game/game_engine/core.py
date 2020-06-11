@@ -34,6 +34,8 @@ class GameEngine(threading.Thread):
                 "location": obj.location
             }
         }
+        if str(obj) == "monster":
+            group_event['data']['hp'] = [obj.hp, obj.max_hp]
         if hasattr(obj, 'id'):
             group_event['data']['id'] = obj.id
         if hasattr(obj, 'direction'):

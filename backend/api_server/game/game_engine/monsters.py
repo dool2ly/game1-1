@@ -5,13 +5,14 @@ import random
 
 class Monster(object):
     name = ''
+    max_hp = 0
 
     def __init__(self, id, map_id, location):
         self.id = id
         self.map_id = map_id
         self.location = location
         self.movement_time = 0
-        self.hp = 100
+        self.hp = self.max_hp
 
         self.update_movement()
 
@@ -41,12 +42,18 @@ class Monster(object):
 
 
 class Deer(Monster):
+    name = "Deer"
+    max_hp = 100
+
     def __init__(self, id, map, location):
         super().__init__(id, map, location)
-        self.name = "Deer"    
+        
 
 
 class Pig(Monster):
+    name = "Pig"
+    max_hp = 150
+
     def __init__(self, id, map, location):
         super().__init__(id, map, location)
-        self.name = "Pig"
+        

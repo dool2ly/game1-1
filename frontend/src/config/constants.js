@@ -16,10 +16,12 @@ export const OBJECT_HEIGHT = 60
 
 export const SET_AVATAR = 'SET_AVATAR'
 export const MOVE_AVATAR = 'MOVE_AVATAR'
+export const ATTACK_AVATAR = 'ATTACK_AVATAR'
 export const UNSET_AVATAR = 'UNSET_AVATAR'
 export const RESET_AVATAR = 'RESET_AVATAR'
 
 export const SET_MONSTER = 'SET_MONSTER'
 export const MOVE_MONSTER = 'MOVE_MONSTER'
+export const ATTACK_MONSTER = 'ATTACK_MONSTER'
 export const UNSET_MONSTER = 'UNSET_MONSTER'
 export const RESET_MONSTER = 'RESET_MONSTER'

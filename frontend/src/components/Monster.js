@@ -8,8 +8,8 @@ function Monster(props) {
     const [posX, posY] = props.pos
     
     useEffect(() => {
-        props.objectImg.src = walkDeer
-      }, [props.objectImg]) 
+        props.walkImg.src = walkDeer
+      }, [props.walkImg]) 
     
       return (
           <div className='monster' style={{ top: posY, left: posX }}>

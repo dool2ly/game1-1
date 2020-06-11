@@ -2,17 +2,19 @@ import {
     SET_AVATAR,
     UNSET_AVATAR,
     MOVE_AVATAR,
-    RESET_AVATAR
+    RESET_AVATAR,
+    ATTACK_AVATAR
 } from '../config/constants'
 
-export const setAvatar = (name, location, direction, active) => {
+export const setAvatar = (name, location, direction) => {
     return {
         type: SET_AVATAR,
         payload: {
             name,
             location,
             direction,
-            active: true
+            active: true,
+            attack: 0
         }
     }
 }
@@ -28,6 +30,14 @@ export const moveAvatar = (name, location, direction) => {
     }
 }
 
+export const attackAvatar = (name) => {
+    return {
+        type: ATTACK_AVATAR,
+        payload: {
+            name
+        }
+    }
+}
 export const unsetAvatar = (name) => {
     return {
         type: UNSET_AVATAR,

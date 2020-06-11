@@ -8,6 +8,7 @@ import Monster from './Monster'
 import {
     setAvatar,
     moveAvatar,
+    attackAvatar,
     unsetAvatar,
     resetAvatar
 } from '../actions/Avatar'
@@ -19,8 +20,8 @@ import {
 } from '../actions/Monster'
 
 function World(props) {
-    const { handleAvatarsRef, handleMonstersRef } = props
-    const { setAvatar, moveAvatar, unsetAvatar, resetAvatar } = props
+    const { handleAvatarsRef, handleMonstersRef, handleEventRef } = props
+    const { attackAvatar, setAvatar, moveAvatar, unsetAvatar, resetAvatar } = props
     const { setMonster, moveMonster , unsetMonster, resetMonster } = props
 
     useEffect(() => {
@@ -53,7 +54,7 @@ function World(props) {
 
             switch (data['state']) {
                 case 'set':
-                    setMonster(data['id'], data['name'], data['location'])
+                    setMonster(data['id'], data['name'], data['location'], data['hp'])
                     break
                 
                 case 'move':
@@ -64,12 +65,22 @@ function World(props) {
                     return
             }
         }
+
+        handleEventRef.current = (data) => {
+            switch (data['type']) {
+                case 'attack':
+                    attackAvatar(data['from'])
+                default:
+                    return
+            }
+            
+        }
     
         return () => {
             resetAvatar()
             resetMonster()
         }
-    }, [handleAvatarsRef, handleMonstersRef, setAvatar, moveAvatar, unsetAvatar, resetAvatar, setMonster, moveMonster, unsetMonster, resetMonster])
+    }, [handleEventRef, handleAvatarsRef, handleMonstersRef, setAvatar, moveAvatar, attackAvatar, unsetAvatar, resetAvatar, setMonster, moveMonster, unsetMonster, resetMonster])
     
     return (
         <div className='world'>
@@ -80,6 +91,7 @@ function World(props) {
                             key={i}
                             name={avatar['name']}
                             pos={avatar['location']}
+                            attack={avatar['attack']}
                             direction={avatar['direction']}
                         />
                     )
@@ -93,6 +105,7 @@ function World(props) {
                     key={'m' + i}
                     name={monster['name']}
                     pos={monster['location']}
+                    attack={monster['attack']}
                 />
             ))}
         </div>
@@ -103,6 +116,7 @@ const mapStateToProps = ({ avatar, monster }) => ({ avatar, monster })
 const mapDispatchToProps = {
     setAvatar,
     moveAvatar,
+    attackAvatar,
     unsetAvatar,
     resetAvatar,
     setMonster,

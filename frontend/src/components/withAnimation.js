@@ -9,18 +9,20 @@ function withAnimation(InputComponent) {
         const ticksPerFrame = 5
         const prevPosX = useRef()
         const prevPosY = useRef()
+        const prevAttack = useRef(null)
         const canvasRef = useRef(null)
-        const [objectImg] = useState(new Image())
+        const [walkImg] = useState(new Image())
+        const [attackImg] = useState(new Image())
         const directionMap = { down: 0, left: 1, right: 2, up: 3 }
 
-        const handleCanvas = (action, dir = 0) => {
+        const handleCanvas = (action, img, dir = 0) => {
             if (canvasRef && canvasRef.current) {
                 const ctx = canvasRef.current.getContext('2d')
 
-                const draw = frame => {
+                const draw = (frame) => {
                     ctx.clearRect(0, 0, OBJECT_WIDTH, OBJECT_HEIGHT)
                     ctx.drawImage(
-                        objectImg,
+                        img,
                         frame * OBJECT_WIDTH,
                         dir * OBJECT_HEIGHT,
                         OBJECT_WIDTH,
@@ -59,9 +61,10 @@ function withAnimation(InputComponent) {
         }
 
         useEffect(() => {            
-            objectImg.onload = () => {
+            walkImg.onload = () => {
                 handleCanvas(
                     'draw',
+                    walkImg,
                     props.direction? directionMap[props.direction] : 0
                 )
             }
@@ -70,22 +73,36 @@ function withAnimation(InputComponent) {
         useEffect(() => {
             prevPosX.current = props.pos[0]
             prevPosY.current = props.pos[1]
-        }, [props.pos])
+            prevAttack.current = props.attack
+        }, [props.pos, props.attack])
         useEffect(() => {})
 
         if (props.pos[0] - prevPosX.current < 0) {
-            handleCanvas('animate', directionMap['left'])
+            handleCanvas('animate', walkImg, directionMap['left'])
         } else if (props.pos[0] - prevPosX.current > 0) {
-            handleCanvas('animate', directionMap['right'])
+            handleCanvas('animate', walkImg, directionMap['right'])
         } else if (props.pos[1] - prevPosY.current < 0) {
-            handleCanvas('animate', directionMap['up'])
+            handleCanvas('animate', walkImg, directionMap['up'])
         } else if (props.pos[1] - prevPosY.current > 0) {
-            handleCanvas('animate', directionMap['down'])
+            handleCanvas('animate', walkImg, directionMap['down'])
         } else if (props.direction) {
-            handleCanvas('draw', directionMap[props.direction])
+            handleCanvas('draw', walkImg, directionMap[props.direction])
+        }
+        // prevAttack.current > 0 &&
+        if (prevAttack.current !== null && props.attack !== prevAttack.current ) {
+            if (attackImg.src) {
+                handleCanvas('animate', attackImg, directionMap[props.direction])
+            }
         }
 
-        return <InputComponent {...props} canvasRef={canvasRef} objectImg={objectImg} />
+        return (
+            <InputComponent
+                {...props}
+                canvasRef={canvasRef}
+                walkImg={walkImg}
+                attackImg={attackImg}
+            />
+        )
     }
 }
 

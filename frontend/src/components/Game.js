@@ -16,6 +16,7 @@ function Game(props) {
     const handleStats = useRef(null)
     const handleAvatars = useRef(null)
     const handleMonsters = useRef(null)
+    const handleEvent = useRef(null)
     const isMountedRef = useIsMountedRef()
     const [toHome, setToHome] = useState(false)
     const moveCommands = [37, 38, 39, 40]
@@ -69,7 +70,6 @@ function Game(props) {
         
                 switch (jsonData['target']) {
                     case 'avatar':
-                        
                         handleAvatars.current(jsonData['data'])
                         break
                     case 'stats':
@@ -77,6 +77,9 @@ function Game(props) {
                         break
                     case 'monster':
                         handleMonsters.current(jsonData['data'])
+                        break
+                    case 'event':
+                        handleEvent.current(jsonData['data'])
                         break
                     default:
                         return
@@ -103,7 +106,11 @@ function Game(props) {
     return (
     <div className='game'>
         <div>
-            <World handleAvatarsRef={handleAvatars} handleMonstersRef={handleMonsters} />
+            <World
+                handleAvatarsRef={handleAvatars}
+                handleMonstersRef={handleMonsters}
+                handleEventRef={handleEvent}
+            />
             <Chat handleChatRef={handleChat} />
         </div>
         <GameInfo handleStatsRef={handleStats} />

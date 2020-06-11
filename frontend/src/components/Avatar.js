@@ -2,7 +2,8 @@ import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 
 import { OBJECT_WIDTH, OBJECT_HEIGHT } from '../config/constants'
-import walkAvatar from '../img/Avatar.png'
+import walkAvatar from '../img/walkAvatar.png'
+import attackAvatar from '../img/attackAvatar.png'
 import withAnimation from './withAnimation'
 
 
@@ -23,13 +24,14 @@ function Avatar(props) {
     
     
     useEffect(() => {
-        props.objectImg.src = walkAvatar
-    }, [props.objectImg])
+        props.walkImg.src = walkAvatar
+        props.attackImg.src = attackAvatar
+    }, [props.walkImg, props.attackImg])
 
     return (
         <div className='avatar' style={{ top: posY, left: posX }}>
             { myChats.length !== 0 && <ChatBubble chat={myChats[0].chat} /> }
-            <canvas className='canvas1' ref={props.canvasRef} width={OBJECT_WIDTH} height={OBJECT_HEIGHT} />
+            <canvas ref={props.canvasRef} width={OBJECT_WIDTH} height={OBJECT_HEIGHT} />
             <div className='name-plate'><div>{props.name}</div></div>
         </div>
     )

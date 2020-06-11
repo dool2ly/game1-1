@@ -32,8 +32,7 @@
     .name-plate {
       display: flex;
       justify-content: center;
-      position: absolute;
-      top: $objectHeight;
+      margin-top: $objectHeight;
 
       div {
         background: #d1ab89;

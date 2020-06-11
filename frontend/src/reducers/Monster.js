@@ -2,7 +2,8 @@ import {
     SET_MONSTER,
     MOVE_MONSTER,
     UNSET_MONSTER,
-    RESET_MONSTER
+    RESET_MONSTER,
+    ATTACK_MONSTER
 } from '../config/constants'
 
 const initialState = []
@@ -14,6 +15,13 @@ const monstersReducer = (state = initialState, action) => {
         case SET_MONSTER:
             return prev.concat(action.payload)
         
+        case ATTACK_MONSTER:
+            return prev.map(
+                item => item.name === action.payload.name
+                ? { ...item, attack: Date.now() }
+                : item
+            )
+ 
         case MOVE_MONSTER:
             return prev.map(
                 item => item.id === action.payload.id
