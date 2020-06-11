@@ -103,21 +103,6 @@ function World(props) {
     
     return (
         <div className='world'>
-            {/* {props.avatar && props.avatar.map((avatar, i) => {
-                if (avatar.active) {
-                    return (
-                        <Avatar
-                            key={i}
-                            name={avatar['name']}
-                            pos={avatar['location']}
-                            attack={avatar['attack']}
-                            direction={avatar['direction']}
-                        />
-                    )
-                } else {
-                    return null
-                }
-            })} */}
             {props.avatar && props.avatar.map(avatar => (
                 <Avatar
                     key={avatar['name']}

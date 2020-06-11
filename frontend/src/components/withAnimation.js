@@ -9,7 +9,7 @@ function withAnimation(InputComponent) {
         const ticksPerFrame = 5
         const prevPosX = useRef()
         const prevPosY = useRef()
-        const prevAttack = useRef(null)
+        const prevAttack = useRef()
         const canvasRef = useRef(null)
         const [walkImg] = useState(new Image())
         const [attackImg] = useState(new Image())
@@ -88,8 +88,8 @@ function withAnimation(InputComponent) {
         } else if (props.direction) {
             handleCanvas('draw', walkImg, directionMap[props.direction])
         }
-        // prevAttack.current > 0 &&
-        if (prevAttack.current !== null && props.attack !== prevAttack.current ) {
+
+        if (prevAttack.current !== undefined && props.attack > 0 && props.attack !== prevAttack.current ) {
             if (attackImg.src) {
                 handleCanvas('animate', attackImg, directionMap[props.direction])
             }
