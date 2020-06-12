@@ -24,7 +24,7 @@ Map = namedtuple(
         'max_monster'
     ]
 )
-
+EXP_TABLE = [i for i in range(100, 1000, 100)]
 
 class Avatar(object):
     def __init__(self, name, channel, query_set):
@@ -34,7 +34,13 @@ class Avatar(object):
         self.query_set = query_set
 
         self.activate()
-    
+        self.next_exp = self.get_next_exp()
+
+    def get_next_exp(self):
+        for i in EXP_TABLE:
+            if self.exp < i:
+                return i
+                
     def activate(self):
         self.map_id = self.query_set.current_map
         self.location = self.query_set.location
@@ -44,6 +50,7 @@ class Avatar(object):
         self.max_hp = self.query_set.max_health
         self.max_mp = self.query_set.max_mana
         self.money = self.query_set.money
+        self.exp = self.query_set.exp
 
         self.query_set.active = True
         self.query_set.save()
@@ -57,6 +64,7 @@ class Avatar(object):
         self.query_set.max_health = self.max_hp
         self.query_set.max_mana = self.max_mp
         self.query_set.money = self.money
+        self.query_set.exp = self.exp
 
         self.query_set.active = False
         self.query_set.save()

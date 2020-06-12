@@ -17,9 +17,10 @@ function InfoTable(props) {
 }
 
 function UserStats(props) {
-  const { name, level, health, max_health, mana, max_mana, money } = props.stats
+  const { name, level, health, max_health, mana, max_mana, money, exp, next_exp } = props.stats
   const hpPer = health / max_health * 100
   const mpPer = mana / max_mana * 100
+  const expPer = exp / next_exp * 100
 
   return (
     <div className='user-info'>
@@ -33,6 +34,10 @@ function UserStats(props) {
         <span className='text'>{`${mana}/${max_mana}`}</span>
         <span className='mp-bar' style={{width: mpPer + '%'}} />
       </div>
+      <div className='meter'>
+        <span className='text'>{`${exp}/${next_exp}`}</span>
+        <span className='exp-bar' style={{width: expPer + '%'}} />
+      </div>
       <div className='money'>{money}</div>
     </div>
   )
@@ -45,7 +50,9 @@ function GameInfo(props) {
     level: 0,
     health: 0,
     mana: 0,
-    money: 0
+    money: 0,
+    exp: 0,
+    next_exp: 0
   })
 
   useEffect(() => {

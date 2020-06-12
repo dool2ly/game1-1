@@ -64,9 +64,9 @@ function Game(props) {
 
             webSocket.current.onmessage = (e) => {
                 const jsonData = JSON.parse(e.data)
-                // if (jsonData['target'] !== 'monster') {
-                //     console.log("RECIEVE FROM SERVER", e.data)
-                // }
+                if (jsonData['target'] !== 'monster') {
+                    console.log("RECIEVE FROM SERVER", e.data)
+                }
         
                 switch (jsonData['target']) {
                     case 'avatar':

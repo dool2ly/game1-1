@@ -15,6 +15,7 @@ class Avatar(models.Model):
     mana = models.IntegerField(default=100)
     max_mana = models.IntegerField(default=100)
     money = models.IntegerField(default=0)
+    exp = models.IntegerField(default=0)
 
     def __str__(self):
         return self.name

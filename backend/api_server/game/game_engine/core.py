@@ -83,11 +83,12 @@ class GameEngine(threading.Thread):
             "target": "stats",
             "data": serializer.data
         }
+        event_data['data']['next_exp'] = avatar.get_next_exp()
         async_to_sync(self.channel_layer.send)(avatar.channel, event_data)
 
     def new_avatar(self, data) -> None:
         """
-        Add new avatar to map
+        User avatar connect
         """
         query_set = AvatarModel.objects.get(name=data['name'])
         if query_set:
