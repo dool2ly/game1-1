@@ -7,6 +7,7 @@ from . import controllers
 class Monster(object):
     name = ''
     max_hp = 0
+    exp = 0
 
     def __init__(self, id, map_id, location):
         self.id = id
@@ -46,6 +47,7 @@ class Monster(object):
 class Deer(Monster):
     name = "Deer"
     max_hp = 100
+    exp = 10
 
     def __init__(self, id, map, location):
         super().__init__(id, map, location)
@@ -55,6 +57,7 @@ class Deer(Monster):
 class Pig(Monster):
     name = "Pig"
     max_hp = 150
+    exp = 15
 
     def __init__(self, id, map, location):
         super().__init__(id, map, location)

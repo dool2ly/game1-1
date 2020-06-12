@@ -77,11 +77,14 @@ class GameEngine(threading.Thread):
             self.send_object_to_group('set', monster)
 
     def send_avatar_statistics(self, avatar):
+        """
+        Send avatar statistics to individual channels
+        """
         serializer = AvatarSerializer(instance=avatar.query_set)
         event_data = {
             "type": "dispatch_channel",
             "target": "stats",
-            "data": serializer.data
+            "data": avatar.stats
         }
         event_data['data']['next_exp'] = avatar.get_next_exp()
         async_to_sync(self.channel_layer.send)(avatar.channel, event_data)
@@ -177,6 +180,9 @@ class GameEngine(threading.Thread):
             target.hp -= 10
             if target.hp <= 0:
                 self.map_controller.pop_monster(target.map_id, target.id)
+                avatar.stats['exp'] += target.exp
+                
+                self.send_avatar_statistics(avatar)
 
         self.send_event_to_group(avatar.map_id, 'attack', avatar.name, target)
             

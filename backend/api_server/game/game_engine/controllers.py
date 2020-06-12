@@ -2,6 +2,7 @@ import time
 import random
 from collections import namedtuple
 
+from game.serializers import AvatarSerializer
 from . import maps
 from . import utils
 
@@ -34,23 +35,17 @@ class Avatar(object):
         self.query_set = query_set
 
         self.activate()
-        self.next_exp = self.get_next_exp()
 
     def get_next_exp(self):
         for i in EXP_TABLE:
-            if self.exp < i:
+            if self.stats['exp'] < i:
                 return i
-                
+
     def activate(self):
         self.map_id = self.query_set.current_map
         self.location = self.query_set.location
-        self.level = self.query_set.level
-        self.hp = self.query_set.health
-        self.mp = self.query_set.mana
-        self.max_hp = self.query_set.max_health
-        self.max_mp = self.query_set.max_mana
-        self.money = self.query_set.money
-        self.exp = self.query_set.exp
+        serializer = AvatarSerializer(self.query_set)
+        self.stats = serializer.data
 
         self.query_set.active = True
         self.query_set.save()
@@ -58,13 +53,9 @@ class Avatar(object):
     def deactivate(self):
         self.query_set.current_map = self.map_id
         self.query_set.location = self.location
-        self.query_set.level = self.level
-        self.query_set.health = self.hp
-        self.query_set.mana = self.mp
-        self.query_set.max_health = self.max_hp
-        self.query_set.max_mana = self.max_mp
-        self.query_set.money = self.money
-        self.query_set.exp = self.exp
+        serializer = AvatarSerializer(self.query_set, data=self.stats)
+        if serializer.is_valid():
+            serializer.save()
 
         self.query_set.active = False
         self.query_set.save()
