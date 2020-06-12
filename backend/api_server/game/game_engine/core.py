@@ -86,7 +86,7 @@ class GameEngine(threading.Thread):
             "target": "stats",
             "data": avatar.stats
         }
-        event_data['data']['next_exp'] = avatar.get_next_exp()
+        event_data['data']['next_exp'] = avatar.get_max_exp()
         async_to_sync(self.channel_layer.send)(avatar.channel, event_data)
 
     def new_avatar(self, data) -> None:
@@ -180,7 +180,8 @@ class GameEngine(threading.Thread):
             target.hp -= 10
             if target.hp <= 0:
                 self.map_controller.pop_monster(target.map_id, target.id)
-                avatar.stats['exp'] += target.exp
+                # avatar.stats['exp'] += target.exp
+                avatar.add_exp(target.exp)
                 
                 self.send_avatar_statistics(avatar)
 
